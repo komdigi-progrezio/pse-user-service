@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { account, account_roles } from 'models';
+import { account, account_roles, roles } from 'models';
 import { Op } from 'sequelize';
 
 @Injectable()
@@ -16,11 +16,17 @@ export class UsersService {
   async findAllFilter(request: any) {
     const pageSize = 10; // Jumlah item per halaman
     const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
+
     const offset = (page - 1) * pageSize;
 
     const queryOptions: any = {};
+    // return request.roles;
 
-    if (request.status !== 'all') {
+    if (request.roles && request.roles === 'admin') {
+      queryOptions.is_admin = 1;
+    }
+
+    if (request.status && request.status !== 'all') {
       queryOptions.status = request.status;
     }
 
@@ -60,13 +66,20 @@ export class UsersService {
     }
 
     const data = await account.findAll({
-      include: account_roles,
-      // limit: pageSize,
-      // offset: offset,
-      // where: queryOptions,
+      include: [
+        {
+          model: account_roles,
+          include: [
+            {
+              model: roles,
+            },
+          ],
+        },
+      ],
+      limit: pageSize,
+      offset: offset,
+      where: queryOptions,
     });
-
-    return data;
 
     const totalCount = await account.count({ where: queryOptions });
     const totalPages = Math.ceil(totalCount / pageSize);
@@ -80,7 +93,7 @@ export class UsersService {
       tanggal_daftar: item.created_at,
       tanggal_update: item.modified_at,
       status: item.status,
-      role: item.account_role,
+      role: [item.account_role.role.name],
     }));
 
     const to = offset + data.length; // Hitung nilai 'to'
@@ -114,8 +127,21 @@ export class UsersService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const data = await account.findByPk(id, {
+      include: {
+        model: account_roles,
+        include: [
+          {
+            model: roles,
+          },
+        ],
+      },
+    });
+
+    return {
+      data,
+    };
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

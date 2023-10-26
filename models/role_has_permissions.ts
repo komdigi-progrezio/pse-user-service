@@ -6,11 +6,16 @@ import {
   Index,
   Sequelize,
   ForeignKey,
+  BelongsTo,
+  HasOne,
 } from 'sequelize-typescript';
+import { roles } from './roles';
+import { permissions } from './permissions';
 
 export interface role_has_permissionsAttributes {
-  permission_id: string;
-  role_id: string;
+  permission_id?: string;
+  role_id?: string;
+  id?: number;
 }
 
 @Table({
@@ -22,11 +27,26 @@ export class role_has_permissions
   extends Model<role_has_permissionsAttributes, role_has_permissionsAttributes>
   implements role_has_permissionsAttributes
 {
-  @Column({ primaryKey: true, type: DataType.BIGINT })
-  @Index({ name: 'role_has_permissions_pkey', using: 'btree', unique: true })
-  permission_id!: string;
+  @Column({ allowNull: true, type: DataType.BIGINT })
+  permission_id?: string;
 
-  @Column({ primaryKey: true, type: DataType.BIGINT })
+  @ForeignKey(() => roles)
+  @Column({ allowNull: true, type: DataType.BIGINT })
+  role_id?: string;
+
+  @Column({
+    primaryKey: true,
+    type: DataType.INTEGER,
+    defaultValue: Sequelize.literal(
+      "nextval('role_has_permissions_id_seq'::regclass)",
+    ),
+  })
   @Index({ name: 'role_has_permissions_pkey', using: 'btree', unique: true })
-  role_id!: string;
+  id?: number;
+
+  @BelongsTo(() => roles)
+  role?: roles;
+
+  @HasOne(() => permissions, { sourceKey: 'permission_id' })
+  permission?: permissions;
 }

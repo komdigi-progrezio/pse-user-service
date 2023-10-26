@@ -6,7 +6,9 @@ import {
   Index,
   Sequelize,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
+import { role_has_permissions } from './role_has_permissions';
 
 export interface permissionsAttributes {
   id?: string;
@@ -23,6 +25,7 @@ export class permissions
   extends Model<permissionsAttributes, permissionsAttributes>
   implements permissionsAttributes
 {
+  @ForeignKey(() => role_has_permissions)
   @Column({
     primaryKey: true,
     autoIncrement: true,
@@ -49,4 +52,7 @@ export class permissions
 
   @Column({ allowNull: true, type: DataType.INTEGER })
   updated_by?: number;
+
+  @BelongsTo(() => role_has_permissions)
+  role_has_permission?: role_has_permissions;
 }

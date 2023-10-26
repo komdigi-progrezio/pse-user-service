@@ -6,7 +6,11 @@ import {
   Index,
   Sequelize,
   ForeignKey,
+  BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
+import { account_roles } from './account_roles';
+import { role_has_permissions } from './role_has_permissions';
 
 export interface rolesAttributes {
   id?: string;
@@ -23,6 +27,7 @@ export class roles
   extends Model<rolesAttributes, rolesAttributes>
   implements rolesAttributes
 {
+  @ForeignKey(() => account_roles)
   @Column({
     primaryKey: true,
     autoIncrement: true,
@@ -49,4 +54,10 @@ export class roles
 
   @Column({ allowNull: true, type: DataType.INTEGER })
   updated_by?: number;
+
+  @BelongsTo(() => account_roles)
+  account_role?: account_roles;
+
+  @HasMany(() => role_has_permissions, { sourceKey: 'id' })
+  role_has_permissions?: role_has_permissions[];
 }

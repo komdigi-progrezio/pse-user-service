@@ -6,7 +6,7 @@ import {
   Index,
   Sequelize,
   ForeignKey,
-  BelongsTo,
+  HasOne,
 } from 'sequelize-typescript';
 import { account_roles } from './account_roles';
 
@@ -52,7 +52,6 @@ export class account
   extends Model<accountAttributes, accountAttributes>
   implements accountAttributes
 {
-  @ForeignKey(() => account_roles)
   @Column({
     primaryKey: true,
     autoIncrement: true,
@@ -166,6 +165,6 @@ export class account
   @Column({ allowNull: true, type: DataType.BOOLEAN })
   is_has_keycloak?: boolean;
 
-  @BelongsTo(() => account_roles)
+  @HasOne(() => account_roles, { sourceKey: 'id' })
   account_role?: account_roles;
 }

@@ -54,6 +54,6 @@ export * from './permissions';
 export * from './model_has_permissions';
 export * from './roles';
 export * from './request_update';
-export * from './role_has_permissions';
 export * from './account';
 export * from './account_roles';
+export * from './role_has_permissions';

@@ -1,1 +1,4 @@
-1:1, account_id, id, account_roles, account
+1:1, id, account_id, account, account_roles
+1:1, role_id, id, account_roles, roles
+1:N, id, role_id, roles, role_has_permissions
+1:1, permission_id, id, role_has_permissions, permissions
