@@ -28,6 +28,7 @@ export class sis_ruang_lingkup
       "nextval('sis_ruang_lingkup_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'sis_ruang_lingkup_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

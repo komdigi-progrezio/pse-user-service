@@ -29,6 +29,7 @@ export class permissions
     type: DataType.BIGINT,
     defaultValue: Sequelize.literal("nextval('permissions_id_seq'::regclass)"),
   })
+  @Index({ name: 'permissions_pkey', using: 'btree', unique: true })
   id?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })

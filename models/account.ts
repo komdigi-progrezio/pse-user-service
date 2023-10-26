@@ -6,7 +6,9 @@ import {
   Index,
   Sequelize,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
+import { account_roles } from './account_roles';
 
 export interface accountAttributes {
   id?: number;
@@ -50,12 +52,15 @@ export class account
   extends Model<accountAttributes, accountAttributes>
   implements accountAttributes
 {
+  @ForeignKey(() => account_roles)
   @Column({
     primaryKey: true,
     autoIncrement: true,
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('account_id_seq'::regclass)"),
   })
+  @Index({ name: 'account_pkey', using: 'btree', unique: true })
+  @Index({ name: 'account_id_key', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.STRING(50) })
@@ -160,4 +165,7 @@ export class account
 
   @Column({ allowNull: true, type: DataType.BOOLEAN })
   is_has_keycloak?: boolean;
+
+  @BelongsTo(() => account_roles)
+  account_role?: account_roles;
 }

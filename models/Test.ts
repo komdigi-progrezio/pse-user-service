@@ -25,6 +25,7 @@ export class Test
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal('nextval(\'"Test_test1_seq"\'::regclass)'),
   })
+  @Index({ name: 'Test_pkey', using: 'btree', unique: true })
   test1?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

@@ -28,6 +28,7 @@ export class sis_pengguna
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('sis_pengguna_id_seq'::regclass)"),
   })
+  @Index({ name: 'sis_pengguna_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

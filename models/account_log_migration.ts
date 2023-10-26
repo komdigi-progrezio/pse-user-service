@@ -60,6 +60,7 @@ export class account_log_migration
       "nextval('account_log_migration_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'account_log_migration_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.STRING(50) })

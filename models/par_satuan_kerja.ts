@@ -35,6 +35,7 @@ export class par_satuan_kerja
       "nextval('par_satuan_kerja_gid_seq'::regclass)",
     ),
   })
+  @Index({ name: 'par_instansi_copy_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

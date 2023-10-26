@@ -35,6 +35,11 @@ export class oauth_personal_access_clients
       "nextval('oauth_personal_access_clients_id_seq'::regclass)",
     ),
   })
+  @Index({
+    name: 'oauth_personal_access_clients_pkey',
+    using: 'btree',
+    unique: true,
+  })
   id?: string;
 
   @Column({ allowNull: true, type: DataType.BIGINT })

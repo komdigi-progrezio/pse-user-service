@@ -23,9 +23,15 @@ export class oauth_auth_codes
   implements oauth_auth_codesAttributes
 {
   @Column({ primaryKey: true, type: DataType.STRING(100) })
+  @Index({ name: 'oauth_auth_codes_pkey', using: 'btree', unique: true })
   id!: string;
 
   @Column({ allowNull: true, type: DataType.BIGINT })
+  @Index({
+    name: 'oauth_auth_codes_user_id_index',
+    using: 'btree',
+    unique: false,
+  })
   user_id?: string;
 
   @Column({ allowNull: true, type: DataType.BIGINT })

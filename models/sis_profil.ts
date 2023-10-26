@@ -55,9 +55,12 @@ export class sis_profil
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('sis_profil_id_seq'::regclass)"),
   })
+  @Index({ name: 'sis_profil_pkey', using: 'btree', unique: true })
+  @Index({ name: 'sis_profil_id_key', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })
+  @Index({ name: 'account_index', using: 'btree', unique: false })
   account_id?: number;
 
   @Column({ allowNull: true, type: DataType.STRING(100) })

@@ -25,9 +25,15 @@ export class oauth_refresh_tokens
   implements oauth_refresh_tokensAttributes
 {
   @Column({ primaryKey: true, type: DataType.STRING(100) })
+  @Index({ name: 'oauth_refresh_tokens_pkey', using: 'btree', unique: true })
   id!: string;
 
   @Column({ allowNull: true, type: DataType.STRING(100) })
+  @Index({
+    name: 'oauth_refresh_tokens_access_token_id_index',
+    using: 'btree',
+    unique: false,
+  })
   access_token_id?: string;
 
   @Column({ allowNull: true, type: DataType.BOOLEAN })

@@ -35,6 +35,7 @@ export class par_instansi
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('par_instansi_id_seq'::regclass)"),
   })
+  @Index({ name: 'par_instansi_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

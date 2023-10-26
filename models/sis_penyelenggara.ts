@@ -38,6 +38,7 @@ export class sis_penyelenggara
       "nextval('sis_penyelenggara_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'sis_penyelenggara_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

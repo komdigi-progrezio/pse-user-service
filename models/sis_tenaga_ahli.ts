@@ -31,6 +31,7 @@ export class sis_tenaga_ahli
       "nextval('sis_tenaga_ahli_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'sis_tenaga_ahli_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

@@ -30,12 +30,14 @@ export class users
     type: DataType.BIGINT,
     defaultValue: Sequelize.literal("nextval('users_id_seq'::regclass)"),
   })
+  @Index({ name: 'users_pkey', using: 'btree', unique: true })
   id?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })
   name?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })
+  @Index({ name: 'users_email_unique', using: 'btree', unique: true })
   email?: string;
 
   @Column({ allowNull: true, type: DataType.DATE })

@@ -30,6 +30,7 @@ export class sis_helpdesk
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('sis_helpdesk_id_seq'::regclass)"),
   })
+  @Index({ name: 'sis_helpdesk_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

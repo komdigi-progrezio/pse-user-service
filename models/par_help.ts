@@ -25,6 +25,7 @@ export class par_help
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('par_help_id_seq'::regclass)"),
   })
+  @Index({ name: 'par_help_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.STRING(50) })

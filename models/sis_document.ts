@@ -24,6 +24,7 @@ export class sis_document
   implements sis_documentAttributes
 {
   @Column({ primaryKey: true, autoIncrement: true, type: DataType.STRING(255) })
+  @Index({ name: 'sis_document_pkey', using: 'btree', unique: true })
   id?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })

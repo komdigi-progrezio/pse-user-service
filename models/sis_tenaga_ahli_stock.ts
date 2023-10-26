@@ -38,6 +38,7 @@ export class sis_tenaga_ahli_stock
       "nextval('sis_tenaga_ahli_stock_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'sis_tenaga_ahli_stock_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

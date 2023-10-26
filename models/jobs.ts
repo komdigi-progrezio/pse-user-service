@@ -29,9 +29,11 @@ export class jobs
     type: DataType.BIGINT,
     defaultValue: Sequelize.literal("nextval('jobs_id_seq'::regclass)"),
   })
+  @Index({ name: 'jobs_pkey', using: 'btree', unique: true })
   id?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })
+  @Index({ name: 'jobs_queue_index', using: 'btree', unique: false })
   queue?: string;
 
   @Column({ allowNull: true, type: DataType.STRING })

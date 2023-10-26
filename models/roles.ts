@@ -29,6 +29,7 @@ export class roles
     type: DataType.BIGINT,
     defaultValue: Sequelize.literal("nextval('roles_id_seq'::regclass)"),
   })
+  @Index({ name: 'roles_pkey', using: 'btree', unique: true })
   id?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })

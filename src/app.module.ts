@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { account, users } from 'models';
+import { account, account_roles, users } from 'models';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { account, users } from 'models';
       autoLoadModels: true,
       synchronize: true,
     }),
-    SequelizeModule.forFeature([users, account]),
+    SequelizeModule.forFeature([users, account, account_roles]),
     UsersModule,
   ],
 })

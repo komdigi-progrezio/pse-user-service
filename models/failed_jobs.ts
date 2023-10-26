@@ -28,6 +28,7 @@ export class failed_jobs
     type: DataType.BIGINT,
     defaultValue: Sequelize.literal("nextval('failed_jobs_id_seq'::regclass)"),
   })
+  @Index({ name: 'failed_jobs_pkey', using: 'btree', unique: true })
   id?: string;
 
   @Column({ allowNull: true, type: DataType.STRING })

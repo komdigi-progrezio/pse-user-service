@@ -38,6 +38,7 @@ export class sis_sertifikat
       "nextval('sis_sertifikat_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'sis_sertifikat_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

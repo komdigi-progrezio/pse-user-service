@@ -31,6 +31,7 @@ export class account_satuan_kerja
       "nextval('account_satuan_kerja_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'account_satuan_kerja_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

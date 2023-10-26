@@ -20,6 +20,7 @@ export class password_resets
   implements password_resetsAttributes
 {
   @Column({ allowNull: true, type: DataType.STRING(255) })
+  @Index({ name: 'password_resets_email_index', using: 'btree', unique: false })
   email?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })

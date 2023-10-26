@@ -6,7 +6,9 @@ import {
   Index,
   Sequelize,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
+import { account } from './account';
 
 export interface model_has_rolesAttributes {
   role_id: string;
@@ -20,11 +22,28 @@ export class model_has_roles
   implements model_has_rolesAttributes
 {
   @Column({ primaryKey: true, type: DataType.BIGINT })
+  @Index({ name: 'model_has_roles_pkey', using: 'btree', unique: true })
   role_id!: string;
 
   @Column({ primaryKey: true, type: DataType.STRING(255) })
+  @Index({ name: 'model_has_roles_pkey', using: 'btree', unique: true })
+  @Index({
+    name: 'model_has_roles_model_id_model_type_index',
+    using: 'btree',
+    unique: false,
+  })
   model_type!: string;
 
+  @ForeignKey(() => account)
   @Column({ primaryKey: true, type: DataType.BIGINT })
+  @Index({ name: 'model_has_roles_pkey', using: 'btree', unique: true })
+  @Index({
+    name: 'model_has_roles_model_id_model_type_index',
+    using: 'btree',
+    unique: false,
+  })
   model_id!: string;
+
+  @BelongsTo(() => account)
+  account?: account;
 }

@@ -30,6 +30,7 @@ export class user_fcm_tokens
       "nextval('user_fcm_tokens_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'user_fcm_tokens_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.STRING(512) })

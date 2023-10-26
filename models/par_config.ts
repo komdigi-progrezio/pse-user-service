@@ -30,6 +30,7 @@ export class par_config
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('par_config_id_seq'::regclass)"),
   })
+  @Index({ name: 'par_config_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.STRING(50) })

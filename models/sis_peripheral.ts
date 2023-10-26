@@ -31,6 +31,7 @@ export class sis_peripheral
       "nextval('sis_peripheral_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'sis_peripheral_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

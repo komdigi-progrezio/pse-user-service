@@ -53,6 +53,7 @@ export class sis_software
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('sis_software_id_seq'::regclass)"),
   })
+  @Index({ name: 'sis_software_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })

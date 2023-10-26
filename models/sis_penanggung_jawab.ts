@@ -43,6 +43,7 @@ export class sis_penanggung_jawab
       "nextval('sis_penanggung_jawab_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'sis_penanggung_jawab_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

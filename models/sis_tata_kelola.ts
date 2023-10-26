@@ -35,6 +35,7 @@ export class sis_tata_kelola
       "nextval('sis_tata_kelola_id_seq'::regclass)",
     ),
   })
+  @Index({ name: 'sis_tata_kelola_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

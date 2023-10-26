@@ -29,6 +29,7 @@ export class sis_network
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('sis_network_id_seq'::regclass)"),
   })
+  @Index({ name: 'sis_network_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.INTEGER })

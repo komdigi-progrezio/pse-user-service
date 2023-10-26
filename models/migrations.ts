@@ -25,6 +25,7 @@ export class migrations
     type: DataType.INTEGER,
     defaultValue: Sequelize.literal("nextval('migrations_id_seq'::regclass)"),
   })
+  @Index({ name: 'migrations_pkey', using: 'btree', unique: true })
   id?: number;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })

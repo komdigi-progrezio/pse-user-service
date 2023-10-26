@@ -25,15 +25,26 @@ export class notifications
   implements notificationsAttributes
 {
   @Column({ primaryKey: true, type: DataType.UUID })
+  @Index({ name: 'notifications_pkey', using: 'btree', unique: true })
   id!: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })
   type?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })
+  @Index({
+    name: 'notifications_notifiable_type_notifiable_id_index',
+    using: 'btree',
+    unique: false,
+  })
   notifiable_type?: string;
 
   @Column({ allowNull: true, type: DataType.BIGINT })
+  @Index({
+    name: 'notifications_notifiable_type_notifiable_id_index',
+    using: 'btree',
+    unique: false,
+  })
   notifiable_id?: string;
 
   @Column({ allowNull: true, type: DataType.STRING })

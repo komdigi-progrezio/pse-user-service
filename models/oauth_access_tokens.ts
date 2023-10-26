@@ -30,9 +30,15 @@ export class oauth_access_tokens
   implements oauth_access_tokensAttributes
 {
   @Column({ primaryKey: true, type: DataType.STRING(100) })
+  @Index({ name: 'oauth_access_tokens_pkey', using: 'btree', unique: true })
   id!: string;
 
   @Column({ allowNull: true, type: DataType.BIGINT })
+  @Index({
+    name: 'oauth_access_tokens_user_id_index',
+    using: 'btree',
+    unique: false,
+  })
   user_id?: string;
 
   @Column({ allowNull: true, type: DataType.BIGINT })
