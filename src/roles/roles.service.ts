@@ -8,6 +8,7 @@ import {
   role_has_permissions,
   roles,
 } from 'models';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class RolesService {
@@ -15,7 +16,14 @@ export class RolesService {
     return 'This action adds a new role';
   }
 
-  async findAll(request) {
+  async findAll(request: any) {
+    const queryOptions: any = {};
+    if (request.filter && request.q) {
+      queryOptions[request.filter] = {
+        [Op.iLike]: `%${request.q}%`,
+      };
+    }
+
     const data = await roles.findAll({
       include: [
         {
@@ -28,9 +36,8 @@ export class RolesService {
           ],
         },
       ],
+      where: queryOptions,
     });
-
-    // return data;
 
     const formattedData = await Promise.all(
       data.map(async (item) => {
@@ -60,8 +67,37 @@ export class RolesService {
       }),
     );
 
+    const pageSize = 10;
+    const page = request.page;
+    const offset = (page - 1) * pageSize;
+
+    const totalCount = await roles.count();
+
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const to = offset + data.length;
+
     return {
       data: formattedData,
+      links: {
+        first: `${process.env.APP_DOMAIN}/api/roles/filter?page=1`,
+        last: `${process.env.APP_DOMAIN}/api/roles/filter?page=${totalPages}`,
+        prev:
+          page > 1
+            ? `${process.env.APP_DOMAIN}/api/roles/filter?page=${page - 1}`
+            : null,
+        next:
+          page < totalPages
+            ? `${process.env.APP_DOMAIN}/api/roles/filter?page=${page + 1}`
+            : null,
+      },
+      meta: {
+        current_page: page,
+        from: offset + 1,
+        to: to,
+        last_page: totalPages,
+        total: totalCount,
+        per_page: pageSize,
+      },
     };
   }
 
