@@ -1,18 +1,174 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { account, account_roles, roles, users } from 'models';
+import {
+  account,
+  account_roles,
+  account_satuan_kerja,
+  par_satuan_kerja,
+  roles,
+  users,
+} from 'models';
 import { Op } from 'sequelize';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    try {
+      let data = new CreateUserDto();
+      data.isAdmin = createUserDto.isAdmin;
+      data.nama = createUserDto.nama;
+      data.status = +createUserDto.status;
+      data.username = createUserDto.username;
+
+      // return data;
+
+      const errors = await validate(data);
+      // return errors;
+      if (errors.length > 0) {
+        // Jika ada kesalahan validasi, kembalikan pesan kesalahan yang deskriptif
+
+        return {
+          status: 422,
+          message: 'The given data was invalid.',
+          errors: errors
+            .map((error) => Object.values(error.constraints))
+            .flat(),
+        };
+      }
+      // return 0;
+      // return createUserDto;
+      const create = await account.create(data);
+      if (create.id) {
+        return {
+          status: 200,
+          message: 'Data Berhasil di Tambahkan',
+        };
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: `Error: ${error}`,
+      };
+    }
   }
 
-  findAll() {
-    return 'This action adds a new user';
+  async storeParent(request: any) {
+    try {
+      // const satuanKerjaText = await par_satuan_kerja.findOne({
+      //   where:{
+      //     id:
+      //   }
+      // })
+
+      // const data = await account.create(request);
+
+      // const satuanKerja = request.satuan_kerja;
+
+      // // Menggunakan Promise.all untuk menunggu semua operasi selesai
+      // await Promise.all(
+      //   satuanKerja.map(async (element: any) => {
+      //     const satuan_kerja = await account_satuan_kerja.findAll({
+      //       where: {
+      //         satuan_kerja_id: element,
+      //       },
+      //     });
+      //     if (satuan_kerja.length === 0) {
+      //       await account_satuan_kerja.create({
+      //         account_id: data.id,
+      //         satuan_kerja_id: element,
+      //       });
+      //     }
+      //   }),
+      // );
+
+      // const subPejabatId = await roles.findOne({
+      //   where: {
+      //     name: 'Sub Pejabat',
+      //   },
+      // });
+
+      // // Menambahkan role 'Sub Pejabat' untuk akun yang baru dibuat
+      // await account_roles.create({
+      //   account_id: data.id,
+      //   role_id: subPejabatId.id,
+      // });
+
+      // Mengembalikan data akun yang baru dibuat
+      return {
+        status: 400,
+        message: 'UNDER MAINTENANCE',
+      };
+    } catch (error) {
+      // Menangkap dan mengembalikan pesan kesalahan jika terjadi kesalahan
+      return {
+        status: 500,
+        message: 'Gagal menyimpan data: ' + error.message,
+      };
+    }
   }
+
+  async findAll(request: any) {
+    const pageSize = 10; // Jumlah item per halaman
+    const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
+
+    const offset = (page - 1) * pageSize;
+    const queryOptions: any = {};
+
+    if (request.status && request.status !== 'all') {
+      queryOptions.status = request.status;
+    }
+
+    if (
+      request.filter &&
+      request.filter !== 'all' &&
+      request.q &&
+      request.q !== null
+    ) {
+      if (request.filter === 'instansi') {
+        queryOptions.instansi_induk_text = {
+          [Op.iLike]: `%${request.q}%`,
+        };
+      } else {
+        queryOptions[request.filter] = {
+          [Op.iLike]: `%${request.q}%`,
+        };
+      }
+    }
+
+    const data = await account.findAll({
+      include: [
+        {
+          model: account_roles,
+          include: [
+            {
+              model: roles,
+              where: {
+                name: {
+                  [Op.in]: ['Sub Pejabat', 'Pejabat'],
+                },
+              },
+            },
+          ],
+        },
+      ],
+      where: queryOptions,
+      order: [['last_login', 'DESC']],
+      limit: pageSize,
+      offset: offset,
+    });
+
+    return this.formatResponse(
+      data,
+      queryOptions,
+      page,
+      pageSize,
+      offset,
+      '/api/users/filter/officiallog',
+    );
+  }
+
   async changeStatusUser(request: any) {
     try {
       const result = await account.update(
@@ -42,6 +198,42 @@ export class UsersService {
     }
   }
 
+  private async formatResponse(
+    data: any,
+    queryOptions: any,
+    page: number,
+    pageSize: number,
+    offset: number,
+    basePath: string = '',
+  ) {
+    const totalCount = await this.getAccountCount(queryOptions);
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const to = offset + data.length;
+    return {
+      data,
+      links: {
+        first: `${process.env.APP_DOMAIN}${basePath}?page=1`,
+        last: `${process.env.APP_DOMAIN}${basePath}?page=${totalPages}`,
+        prev:
+          page > 1
+            ? `${process.env.APP_DOMAIN}${basePath}?page=${page - 1}`
+            : null,
+        next:
+          page < totalPages
+            ? `${process.env.APP_DOMAIN}${basePath}?page=${page + 1}`
+            : null,
+      },
+      meta: {
+        current_page: page,
+        from: offset + 1,
+        to,
+        last_page: totalPages,
+        total: totalCount,
+        per_page: pageSize,
+      },
+    };
+  }
+
   async parent(request: any) {
     const pageSize = 10; // Jumlah item per halaman
     const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
@@ -60,11 +252,6 @@ export class UsersService {
       offset: offset,
     });
 
-    const totalCount = await account.count({ where: queryOptions });
-    const totalPages = Math.ceil(totalCount / pageSize);
-
-    const to = offset + data.length;
-
     const formattedData = data.map((item) => {
       return {
         id: item.id,
@@ -75,43 +262,21 @@ export class UsersService {
       };
     });
 
-    return {
-      data: formattedData,
-      links: {
-        first: `${process.env.APP_DOMAIN}api/users/parent/account?page=1`,
-        last: `${process.env.APP_DOMAIN}api/users/parent/account?page=${totalPages}`,
-        prev:
-          page > 1
-            ? `${process.env.APP_DOMAIN}api/users/parent/account?page=${
-                page - 1
-              }`
-            : null,
-        next:
-          page < totalPages
-            ? `${process.env.APP_DOMAIN}api/users/parent/account?page=${
-                page + 1
-              }`
-            : null,
-      },
-      meta: {
-        current_page: page,
-        from: offset + 1,
-        to: to,
-        last_page: totalPages,
-        total: totalCount,
-        per_page: pageSize,
-      },
-    };
+    return this.formatResponse(
+      formattedData,
+      queryOptions,
+      page,
+      pageSize,
+      offset,
+      '/api/users/parent/account',
+    );
   }
 
   async findAllFilter(request: any) {
     const pageSize = 10; // Jumlah item per halaman
     const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
-
     const offset = (page - 1) * pageSize;
-
     const queryOptions: any = {};
-    // return request.roles;
 
     if (request.roles && request.roles === 'admin') {
       queryOptions.is_admin = 1;
@@ -172,9 +337,6 @@ export class UsersService {
       where: queryOptions,
     });
 
-    const totalCount = await account.count({ where: queryOptions });
-    const totalPages = Math.ceil(totalCount / pageSize);
-
     const formattedData = data.map((item) => ({
       id: item.id,
       nama: item.nama,
@@ -187,46 +349,23 @@ export class UsersService {
       role: [item.account_role.role.name],
     }));
 
-    const to = offset + data.length; // Hitung nilai 'to'
-
-    return {
-      data: formattedData,
-      links: {
-        first: `${process.env.APP_DOMAIN}/api/users/filter/official?page=1`,
-        last: `${process.env.APP_DOMAIN}/api/users/filter/official?page=${totalPages}`,
-        prev:
-          page > 1
-            ? `${process.env.APP_DOMAIN}/api/users/filter/official?page=${
-                page - 1
-              }`
-            : null,
-        next:
-          page < totalPages
-            ? `${process.env.APP_DOMAIN}/api/users/filter/official?page=${
-                page + 1
-              }`
-            : null,
-      },
-      meta: {
-        current_page: page,
-        from: offset + 1,
-        to: to,
-        last_page: totalPages,
-        total: totalCount,
-        per_page: pageSize,
-      },
-    };
+    return this.formatResponse(
+      formattedData,
+      queryOptions,
+      page,
+      pageSize,
+      offset,
+      '/api/users/filter/official',
+    );
   }
 
   async change(request: any) {
     const pageSize = 10; // Jumlah item per halaman
     const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
     const agency = request.agency;
-
     const offset = (page - 1) * pageSize;
 
     const queryOptions: any = {};
-
     queryOptions.status_register = 2;
     queryOptions.status = [0, null];
 
@@ -256,9 +395,6 @@ export class UsersService {
 
     // return data;
 
-    const totalCount = await account.count({ where: queryOptions });
-    const totalPages = Math.ceil(totalCount / pageSize);
-
     const formattedData = await Promise.all(
       data.map(async (item) => {
         const oldname = await account.findOne({
@@ -284,35 +420,14 @@ export class UsersService {
       }),
     );
 
-    const to = offset + data.length; // Hitung nilai 'to'
-
-    return {
-      data: formattedData,
-      links: {
-        first: `${process.env.APP_DOMAIN}/api/users/filter/official?page=1`,
-        last: `${process.env.APP_DOMAIN}/api/users/filter/official?page=${totalPages}`,
-        prev:
-          page > 1
-            ? `${process.env.APP_DOMAIN}/api/users/filter/official?page=${
-                page - 1
-              }`
-            : null,
-        next:
-          page < totalPages
-            ? `${process.env.APP_DOMAIN}/api/users/filter/official?page=${
-                page + 1
-              }`
-            : null,
-      },
-      meta: {
-        current_page: page,
-        from: offset + 1,
-        to: to,
-        last_page: totalPages,
-        total: totalCount,
-        per_page: pageSize,
-      },
-    };
+    return this.formatResponse(
+      formattedData,
+      queryOptions,
+      page,
+      pageSize,
+      offset,
+      '/api/users/change',
+    );
   }
 
   async findOne(id: number) {
@@ -332,11 +447,99 @@ export class UsersService {
     };
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async newManager(id: number) {
+    const findUser = await account.findByPk(id);
+
+    const queryOptions: any = {};
+    queryOptions.instansi_induk = findUser.instansi_induk;
+    queryOptions.status_register = 1;
+
+    const data = await account.findAll({
+      where: queryOptions,
+    });
+
+    return {
+      data: data[0],
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      let data = new UpdateUserDto();
+      data.id = updateUserDto.id;
+      data.isAdmin = updateUserDto.isAdmin;
+      data.nama = updateUserDto.nama;
+      data.status = +updateUserDto.status;
+      data.username = updateUserDto.username;
+
+      // return data;
+
+      const errors = await validate(data);
+      // return errors;
+      if (errors.length > 0) {
+        // Jika ada kesalahan validasi, kembalikan pesan kesalahan yang deskriptif
+
+        return {
+          status: 422,
+          message: 'The given data was invalid.',
+          errors: errors
+            .map((error) => Object.values(error.constraints))
+            .flat(),
+        };
+      }
+      // return 0;
+      // return updateUserDto;
+      const create = await account.update(data, {
+        where: {
+          id,
+        },
+      });
+      // return create;
+
+      if (create) {
+        return {
+          status: 200,
+          message: 'Data Berhasil di Perbaharui',
+        };
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: `Error: ${error}`,
+      };
+    }
+  }
+
+  async remove(id: number) {
+    try {
+      const response = await account.destroy({
+        where: { id },
+      });
+
+      if (response) {
+        return {
+          status: 200,
+          message: 'Data Berhasil di Hapus',
+        };
+      } else {
+        throw new Error('Data dengan ID tersebut tidak ditemukan.');
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: 'Gagal menghapus data: ' + error.message,
+      };
+    }
+  }
+
+  async updateProfile(id: number, request: any) {
+    return {
+      status: 400,
+      message: 'UNDER MAINTENANCE',
+    };
+  }
+
+  private async getAccountCount(queryOptions: any) {
+    return await account.count({ where: queryOptions });
   }
 }

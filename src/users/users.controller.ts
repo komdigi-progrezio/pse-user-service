@@ -9,13 +9,17 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @MessagePattern('createUser')
-  create(@Payload() createUserDto: CreateUserDto) {
+  create(@Payload() createUserDto: any) {
     return this.usersService.create(createUserDto);
+  }
+  @MessagePattern('storeParent')
+  storeParent(@Payload() data: any) {
+    return this.usersService.storeParent(data);
   }
 
   @MessagePattern('findAllUsers')
-  findAll() {
-    return this.usersService.findAll();
+  findAll(request: any) {
+    return this.usersService.findAll(request);
   }
 
   @MessagePattern('findAllUsersFilter')
@@ -25,6 +29,10 @@ export class UsersController {
   @MessagePattern('findChangeUsersFilter')
   change(data: any) {
     return this.usersService.change(data);
+  }
+  @MessagePattern('newManager')
+  newManager(id: any) {
+    return this.usersService.newManager(id);
   }
   @MessagePattern('parentUserFilter')
   parent(data: any) {
@@ -80,12 +88,17 @@ export class UsersController {
   }
 
   @MessagePattern('updateUser')
-  update(@Payload() updateUserDto: UpdateUserDto) {
+  update(@Payload() updateUserDto: any) {
     return this.usersService.update(updateUserDto.id, updateUserDto);
   }
 
   @MessagePattern('removeUser')
   remove(@Payload() id: number) {
     return this.usersService.remove(id);
+  }
+
+  @MessagePattern('updateProfile')
+  updateProfile(updateProfile: any) {
+    return this.usersService.updateProfile(updateProfile.id, updateProfile);
   }
 }

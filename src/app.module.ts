@@ -4,12 +4,15 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import {
   account,
   account_roles,
+  account_satuan_kerja,
+  par_satuan_kerja,
   permissions,
   role_has_permissions,
   roles,
   users,
 } from 'models';
 import { RolesModule } from './roles/roles.module';
+import { PermissionsModule } from './permissions/permissions.module';
 
 @Module({
   imports: [
@@ -31,9 +34,12 @@ import { RolesModule } from './roles/roles.module';
       roles,
       role_has_permissions,
       permissions,
+      account_satuan_kerja,
+      par_satuan_kerja,
     ]),
     UsersModule,
     RolesModule,
+    PermissionsModule,
   ],
 })
 export class AppModule {}

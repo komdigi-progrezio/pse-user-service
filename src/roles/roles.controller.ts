@@ -19,8 +19,8 @@ export class RolesController {
   }
 
   @MessagePattern('findOneRole')
-  findOne(@Payload() id: number) {
-    return this.rolesService.findOne(id);
+  findOne(@Payload() data: any) {
+    return this.rolesService.findOne(data.id);
   }
 
   @MessagePattern('updateRole')

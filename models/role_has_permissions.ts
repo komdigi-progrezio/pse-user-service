@@ -7,7 +7,6 @@ import {
   Sequelize,
   ForeignKey,
   BelongsTo,
-  HasOne,
 } from 'sequelize-typescript';
 import { roles } from './roles';
 import { permissions } from './permissions';
@@ -27,6 +26,7 @@ export class role_has_permissions
   extends Model<role_has_permissionsAttributes, role_has_permissionsAttributes>
   implements role_has_permissionsAttributes
 {
+  @ForeignKey(() => permissions)
   @Column({ allowNull: true, type: DataType.BIGINT })
   permission_id?: string;
 
@@ -47,6 +47,6 @@ export class role_has_permissions
   @BelongsTo(() => roles)
   role?: roles;
 
-  @HasOne(() => permissions, { sourceKey: 'permission_id' })
+  @BelongsTo(() => permissions)
   permission?: permissions;
 }

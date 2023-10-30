@@ -12,8 +12,20 @@ import { Op } from 'sequelize';
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  async create(createRoleDto: any) {
+    try {
+      const data = await roles.create(createRoleDto);
+
+      return {
+        status: 400,
+        message: 'UNDER MAINTENANCE',
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: `Error: ${error}`,
+      };
+    }
   }
 
   async findAll(request: any) {
@@ -101,15 +113,100 @@ export class RolesService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
+  async findOne(id: number) {
+    try {
+      const data = await roles.findByPk(id, {
+        include: [
+          {
+            model: role_has_permissions,
+            include: [
+              {
+                model: permissions,
+                attributes: ['name'],
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!data) {
+        return {
+          status: 404,
+          message: 'Role not found',
+        };
+      }
+
+      const createdBy = data.created_by
+        ? (
+            await account.findByPk(data.created_by, {
+              attributes: ['nama'],
+            })
+          )?.nama
+        : null;
+
+      const updatedBy = data.updated_by
+        ? (
+            await account.findByPk(data.updated_by, {
+              attributes: ['nama'],
+            })
+          )?.nama
+        : null;
+
+      const permissionsDAta = data.role_has_permissions.map(
+        (element) => element.permission.name,
+      );
+
+      return {
+        status: 200,
+        data: {
+          id: data.id,
+          name: data.name,
+          guard_name: data.guard_name,
+          created_by: createdBy,
+          updated_by: updatedBy,
+          permissions: permissionsDAta,
+        },
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: 'Internal Server Error: ' + error.message,
+      };
+    }
   }
 
   update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+    // return updateRoleDto;
+
+    return {
+      status: 400,
+      message: 'UNDER MAINTENANCE',
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async remove(id: number) {
+    try {
+      const data = await roles.destroy({
+        where: {
+          id,
+        },
+      });
+      if (data > 0) {
+        return {
+          status: 200,
+          message: 'Data Berhasil di Hapus',
+        };
+      } else {
+        return {
+          status: 404,
+          message: 'Role not found',
+        };
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: 'Error : ' + error,
+      };
+    }
   }
 }
