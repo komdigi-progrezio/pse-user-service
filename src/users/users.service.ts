@@ -14,6 +14,23 @@ import { validate } from 'class-validator';
 
 @Injectable()
 export class UsersService {
+  async auth() {
+    const data = await account.findByPk(4);
+
+    return {
+      id: data.id,
+      nama: data.nama,
+      email: data.email,
+      status: data.status,
+      nama_status: data.status === 1 ? 'Aktif' : 'Tidak Aktif',
+      username: data.username,
+      nip: data.nip,
+      jabatan: data.jabatan,
+      no_telepon: data.no_telepon,
+      satuan_kerja: data.satuan_kerja,
+    };
+  }
+
   async create(createUserDto: CreateUserDto) {
     try {
       let data = new CreateUserDto();

@@ -8,6 +8,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @MessagePattern('authUser')
+  auth(@Payload() authUserDto: any) {
+    return this.usersService.auth();
+  }
   @MessagePattern('createUser')
   create(@Payload() createUserDto: any) {
     return this.usersService.create(createUserDto);
