@@ -6,7 +6,10 @@ import {
   account_roles,
   account_satuan_kerja,
   par_satuan_kerja,
+  permissions,
+  role_has_permissions,
   roles,
+  user_fcm_tokens,
   users,
 } from 'models';
 import { Op } from 'sequelize';
@@ -15,20 +18,118 @@ import { validate } from 'class-validator';
 @Injectable()
 export class UsersService {
   async auth() {
-    const data = await account.findByPk(4);
+    // 'kode_pos' => $this->parInstansi === null ? 'Kosong' : $this->parInstansi->kode_pos,
+    // 'instansi_induk' => $this->instansi_induk,
+    // 'dokumen' => $this->dokumen,
+    // 'url_dokumen' => url('/') . '/storage/dokumen_pejabat/' . $this->id . '/' . $this->dokumen,
+    // 'last_login' => $this->last_login,
+
+    const dataUser = await account.findByPk(4, {
+      include: {
+        model: account_roles,
+        include: [
+          {
+            model: roles,
+            include: [
+              {
+                model: role_has_permissions,
+                include: [
+                  {
+                    model: permissions,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    // return dataUser;
+
+    const permissionsData = [];
+
+    for (
+      let i = 0;
+      i < dataUser.account_role.role.role_has_permissions.length;
+      i++
+    ) {
+      const element = dataUser.account_role.role.role_has_permissions[i];
+      permissionsData.push(element.permission.name);
+    }
+
+    // return permissionsData;
 
     return {
-      id: data.id,
-      nama: data.nama,
-      email: data.email,
-      status: data.status,
-      nama_status: data.status === 1 ? 'Aktif' : 'Tidak Aktif',
-      username: data.username,
-      nip: data.nip,
-      jabatan: data.jabatan,
-      no_telepon: data.no_telepon,
-      satuan_kerja: data.satuan_kerja,
+      data: {
+        id: dataUser.id,
+        nama: dataUser.nama,
+        email: dataUser.email,
+        status: dataUser.status,
+        nama_status: dataUser.status === 1 ? 'Aktif' : 'Tidak Aktif',
+        username: dataUser.username,
+        nip: dataUser.nip,
+        jabatan: dataUser.jabatan,
+        no_telepon: dataUser.no_telepon,
+        satuan_kerja: dataUser.satuan_kerja,
+        alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
+        kota: dataUser.kota,
+        propinsi: dataUser.propinsi,
+        roles: [dataUser.account_role.role.name],
+        permissions: permissionsData,
+      },
     };
+  }
+  private errorResponse(error) {
+    return {
+      status: 500,
+      message: 'Error : ' + error,
+    };
+  }
+
+  async setupAdmin() {
+    try {
+      await account.update(
+        {
+          username: 'adminpse@kominfo.go.id',
+        },
+        {
+          where: {
+            username: 'admin',
+          },
+        },
+      );
+      return {
+        status: 200,
+        message: 'Data Berhasil di Perbaharui',
+      };
+    } catch (error) {
+      this.errorResponse(error);
+    }
+  }
+
+  async notifToken(request: any) {
+    try {
+      await user_fcm_tokens.update(
+        {
+          apns_id: request.token,
+        },
+        {
+          where: {
+            user_id: 4,
+          },
+        },
+      );
+      return {
+        status: 200,
+        message: 'Data Berhasil di Perbaharui',
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: 'Error : ' + error,
+      };
+    }
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -251,6 +352,24 @@ export class UsersService {
     };
   }
 
+  private formatISOStringToDMYHI(dateString) {
+    const date = new Date(dateString); // Membuat objek Date dari string ISO
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    // Menambahkan 0 di depan angka bulan, tanggal, jam, dan menit jika kurang dari 10
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
+    const formattedHours = hours < 10 ? `0${hours}` : hours;
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+    // Mengembalikan string dalam format "d m Y H:i"
+    return `${formattedDay} ${formattedMonth} ${year} ${formattedHours}:${formattedMinutes}`;
+  }
+
   async parent(request: any) {
     const pageSize = 10; // Jumlah item per halaman
     const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
@@ -297,6 +416,8 @@ export class UsersService {
 
     if (request.roles && request.roles === 'admin') {
       queryOptions.is_admin = 1;
+    } else {
+      queryOptions.is_admin = null;
     }
 
     if (request.status && request.status !== 'all') {
@@ -342,6 +463,7 @@ export class UsersService {
       include: [
         {
           model: account_roles,
+
           include: [
             {
               model: roles,
@@ -349,22 +471,31 @@ export class UsersService {
           ],
         },
       ],
+
       limit: pageSize,
       offset: offset,
       where: queryOptions,
     });
 
-    const formattedData = data.map((item) => ({
-      id: item.id,
-      nama: item.nama,
-      nip: item.nip,
-      jabatan: item.jabatan,
-      instansi: item.instansi_induk_text,
-      tanggal_daftar: item.created_at,
-      tanggal_update: item.modified_at,
-      status: item.status,
-      role: [item.account_role.role.name],
-    }));
+    // return data;
+
+    const formattedData = data.map((item) => {
+      return {
+        id: item.id,
+        nama: item.nama,
+        nip: item.nip,
+        jabatan: item.jabatan,
+        instansi_induk_text: item.instansi_induk_text,
+        tanggal_daftar: item.created_at,
+        tanggal_update: item.modified_at,
+        status: item.status,
+        nama_status: item.status == 1 ? 'Aktif' : 'Tidak Aktif',
+        last_login: this.formatISOStringToDMYHI(item.last_login),
+        roles: [item.account_role.role.name],
+        created_at: this.formatISOStringToDMYHI(item.created_at),
+        modified_at: this.formatISOStringToDMYHI(item.modified_at),
+      };
+    });
 
     return this.formatResponse(
       formattedData,
@@ -558,5 +689,12 @@ export class UsersService {
 
   private async getAccountCount(queryOptions: any) {
     return await account.count({ where: queryOptions });
+  }
+
+  async approvedAccountChange(request: any) {
+    const newId = request.new_id;
+    const oldId = request.old_id;
+
+    return request;
   }
 }

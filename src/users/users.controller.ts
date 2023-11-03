@@ -12,6 +12,15 @@ export class UsersController {
   auth(@Payload() authUserDto: any) {
     return this.usersService.auth();
   }
+
+  @MessagePattern('setupAdmin')
+  setupAdmin() {
+    return this.usersService.setupAdmin();
+  }
+  @MessagePattern('notifToken')
+  notifToken(@Payload() request: any) {
+    return this.usersService.notifToken(request);
+  }
   @MessagePattern('createUser')
   create(@Payload() createUserDto: any) {
     return this.usersService.create(createUserDto);
@@ -94,6 +103,10 @@ export class UsersController {
   @MessagePattern('updateUser')
   update(@Payload() updateUserDto: any) {
     return this.usersService.update(updateUserDto.id, updateUserDto);
+  }
+  @MessagePattern('approvedAccountChange')
+  approvedAccountChange(@Payload() request: any) {
+    return this.usersService.approvedAccountChange(request);
   }
 
   @MessagePattern('removeUser')

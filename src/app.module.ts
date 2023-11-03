@@ -9,6 +9,7 @@ import {
   permissions,
   role_has_permissions,
   roles,
+  user_fcm_tokens,
   users,
 } from 'models';
 import { RolesModule } from './roles/roles.module';
@@ -36,6 +37,7 @@ import { PermissionsModule } from './permissions/permissions.module';
       permissions,
       account_satuan_kerja,
       par_satuan_kerja,
+      user_fcm_tokens,
     ]),
     UsersModule,
     RolesModule,
