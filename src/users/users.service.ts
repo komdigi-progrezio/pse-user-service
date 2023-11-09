@@ -17,14 +17,17 @@ import { validate } from 'class-validator';
 
 @Injectable()
 export class UsersService {
-  async auth() {
+  async auth(username) {
     // 'kode_pos' => $this->parInstansi === null ? 'Kosong' : $this->parInstansi->kode_pos,
     // 'instansi_induk' => $this->instansi_induk,
     // 'dokumen' => $this->dokumen,
     // 'url_dokumen' => url('/') . '/storage/dokumen_pejabat/' . $this->id . '/' . $this->dokumen,
     // 'last_login' => $this->last_login,
 
-    const dataUser = await account.findByPk(4, {
+    const dataUser = await account.findOne({
+      where: {
+        username 
+      },
       include: {
         model: account_roles,
         include: [
