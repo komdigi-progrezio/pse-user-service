@@ -17,14 +17,15 @@ import { validate } from 'class-validator';
 
 @Injectable()
 export class UsersService {
-  async auth() {
+  async auth(authUserDto: any) {
     // 'kode_pos' => $this->parInstansi === null ? 'Kosong' : $this->parInstansi->kode_pos,
     // 'instansi_induk' => $this->instansi_induk,
     // 'dokumen' => $this->dokumen,
     // 'url_dokumen' => url('/') . '/storage/dokumen_pejabat/' . $this->id . '/' . $this->dokumen,
     // 'last_login' => $this->last_login,
 
-    const dataUser = await account.findByPk(4, {
+    const dataUser = await account.findOne({
+      where: { username: authUserDto }, 
       include: {
         model: account_roles,
         include: [
@@ -414,11 +415,16 @@ export class UsersService {
     const offset = (page - 1) * pageSize;
     const queryOptions: any = {};
 
+    if (request.email) {
+      queryOptions.username = request.email;
+    }
+
     if (request.roles && request.roles === 'admin') {
       queryOptions.is_admin = 1;
-    } else {
-      queryOptions.is_admin = null;
-    }
+    } 
+    // else {
+    //   queryOptions.is_admin = null;
+    // }
 
     if (request.status && request.status !== 'all') {
       queryOptions.status = request.status;

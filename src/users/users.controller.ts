@@ -10,7 +10,7 @@ export class UsersController {
 
   @MessagePattern('authUser')
   auth(@Payload() authUserDto: any) {
-    return this.usersService.auth();
+    return this.usersService.auth(authUserDto);
   }
 
   @MessagePattern('setupAdmin')
