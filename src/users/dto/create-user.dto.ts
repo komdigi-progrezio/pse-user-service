@@ -35,6 +35,8 @@ function IsUsernameAlreadyExist(validationOptions?: ValidationOptions) {
 
 export class CreateUserDto {
   @IsNotEmpty({ message: 'Nama harus diisi' })
+  name: string;
+
   nama: string;
 
   @IsNotEmpty({ message: 'Username harus diisi' })
@@ -47,5 +49,5 @@ export class CreateUserDto {
   status: number;
 
   @IsNotEmpty({ message: 'isAdmin harus diisi' })
-  isAdmin: number;
+  is_admin: number;
 }

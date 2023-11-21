@@ -133,36 +133,19 @@ export class UsersService {
     }
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: any) {
     try {
-      let data = new CreateUserDto();
-      data.isAdmin = createUserDto.isAdmin;
-      data.nama = createUserDto.nama;
-      data.status = +createUserDto.status;
-      data.username = createUserDto.username;
-
-      // return data;
-
-      const errors = await validate(data);
-      // return errors;
-      if (errors.length > 0) {
-        // Jika ada kesalahan validasi, kembalikan pesan kesalahan yang deskriptif
-
-        return {
-          status: 422,
-          message: 'The given data was invalid.',
-          errors: errors
-            .map((error) => Object.values(error.constraints))
-            .flat(),
-        };
-      }
-      // return 0;
-      // return createUserDto;
+      const data = {
+        nama: createUserDto.name,
+        username: createUserDto.username,
+        status: createUserDto.status,
+        is_admin: 1,
+      };
       const create = await account.create(data);
       if (create.id) {
         return {
           status: 200,
-          message: 'Data Berhasil di Tambahkan',
+          message: 'Data Berhasil di Tambahkan id: ' + create.id,
         };
       }
     } catch (error) {
@@ -421,10 +404,9 @@ export class UsersService {
 
     if (request.roles && request.roles === 'admin') {
       queryOptions.is_admin = 1;
+    } else {
+      queryOptions.is_admin = null;
     }
-    // else {
-    //   queryOptions.is_admin = null;
-    // }
 
     if (request.status && request.status !== 'all') {
       queryOptions.status = request.status;
@@ -488,6 +470,7 @@ export class UsersService {
     const formattedData = data.map((item) => {
       return {
         id: item.id,
+        username: item.username,
         nama: item.nama,
         nip: item.nip,
         jabatan: item.jabatan,
@@ -497,7 +480,7 @@ export class UsersService {
         status: item.status,
         nama_status: item.status == 1 ? 'Aktif' : 'Tidak Aktif',
         last_login: this.formatISOStringToDMYHI(item.last_login),
-        roles: [item.account_role.role.name],
+        roles: item.account_role ? [item.account_role.role.name] : [''],
         created_at: this.formatISOStringToDMYHI(item.created_at),
         modified_at: this.formatISOStringToDMYHI(item.modified_at),
       };
