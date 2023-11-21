@@ -3,6 +3,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { request } from 'http';
 
 @Controller()
 export class UsersController {
@@ -31,24 +32,24 @@ export class UsersController {
   }
 
   @MessagePattern('findAllUsers')
-  findAll(request: any) {
+  findAll(@Payload() request: any) {
     return this.usersService.findAll(request);
   }
 
   @MessagePattern('findAllUsersFilter')
-  filter(data: any) {
-    return this.usersService.findAllFilter(data);
+  filter(@Payload() request: any) {
+    return this.usersService.findAllFilter(request);
   }
   @MessagePattern('findChangeUsersFilter')
-  change(data: any) {
+  change(@Payload() data: any) {
     return this.usersService.change(data);
   }
   @MessagePattern('newManager')
-  newManager(id: any) {
+  newManager(@Payload() id: any) {
     return this.usersService.newManager(id);
   }
   @MessagePattern('parentUserFilter')
-  parent(data: any) {
+  parent(@Payload() data: any) {
     if (!data.parent_id) {
       return {
         data: [],
@@ -115,7 +116,7 @@ export class UsersController {
   }
 
   @MessagePattern('updateProfile')
-  updateProfile(updateProfile: any) {
+  updateProfile(@Payload() updateProfile: any) {
     return this.usersService.updateProfile(updateProfile.id, updateProfile);
   }
 }
