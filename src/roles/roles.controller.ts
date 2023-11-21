@@ -24,7 +24,7 @@ export class RolesController {
   }
 
   @MessagePattern('updateRole')
-  update(@Payload() updateRoleDto: UpdateRoleDto) {
+  update(@Payload() updateRoleDto: any) {
     return this.rolesService.update(updateRoleDto.id, updateRoleDto);
   }
 

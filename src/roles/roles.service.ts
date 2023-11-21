@@ -9,6 +9,8 @@ import {
   roles,
 } from 'models';
 import { Op } from 'sequelize';
+import { updateSuccessResponse } from 'src/utils/updateSuccessResponse';
+import { errorResponse } from 'src/utils/errorResponse';
 
 @Injectable()
 export class RolesService {
@@ -175,13 +177,47 @@ export class RolesService {
     }
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    // return updateRoleDto;
+  async update(id: number, updateRoleDto: any) {
+    try {
+      // return updateRoleDto;
+      const dataRoles = {
+        name: updateRoleDto.name,
+      };
 
-    return {
-      status: 400,
-      message: 'UNDER MAINTENANCE',
-    };
+      const update = await roles.update(dataRoles, {
+        where: {
+          id,
+        },
+      });
+
+      const deleteRolesHasPermissions = await role_has_permissions.destroy({
+        where: {
+          role_id: updateRoleDto.id,
+        },
+      });
+
+      if (deleteRolesHasPermissions) {
+        for (let i = 0; i < updateRoleDto.permissions.length; i++) {
+          const element = updateRoleDto.permissions[i];
+          const permissionData = await permissions.findOne({
+            where: {
+              name: element,
+            },
+          });
+
+          await role_has_permissions.create({
+            role_id: id.toString(),
+            permission_id: permissionData.id,
+          });
+        }
+      }
+
+      if (update) {
+        return updateSuccessResponse();
+      }
+    } catch (error) {
+      return errorResponse(error);
+    }
   }
 
   async remove(id: number) {

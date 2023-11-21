@@ -25,7 +25,7 @@ export class UsersService {
     // 'last_login' => $this->last_login,
 
     const dataUser = await account.findOne({
-      where: { username: authUserDto }, 
+      where: { username: authUserDto },
       include: {
         model: account_roles,
         include: [
@@ -421,7 +421,7 @@ export class UsersService {
 
     if (request.roles && request.roles === 'admin') {
       queryOptions.is_admin = 1;
-    } 
+    }
     // else {
     //   queryOptions.is_admin = null;
     // }
