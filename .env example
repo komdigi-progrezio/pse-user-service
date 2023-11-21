@@ -1,10 +1,10 @@
-PORT=3000
+PORT=3001
 DB_PORT=5432 
 DB_HOST=localhost
 DB_NAME=pse-dev
 DB_USER=postgres
 DB_PASSWORD=root
-SECRET_KEY=kunci_anda
+SECRET_KEY=psebackend20231023
 
 
 APP_DOMAIN=http://127.0.0.1:3000

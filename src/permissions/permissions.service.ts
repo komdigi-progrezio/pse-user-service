@@ -13,7 +13,14 @@ export class PermissionsService {
   async findAll() {
     try {
       const data = await permissions.findAll();
-      return data;
+
+      const formattedData = data.map((item) => ({
+        id: item.id,
+        name: item.name,
+        guard_name: item.guard_name,
+      }));
+
+      return { data: formattedData };
     } catch (error) {
       return {
         status: 500,
