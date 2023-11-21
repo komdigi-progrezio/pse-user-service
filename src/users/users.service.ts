@@ -413,7 +413,8 @@ export class UsersService {
 
     if (request.roles && request.roles === 'admin') {
       queryOptions.is_admin = 1;
-    } else {
+    } 
+    else {
       queryOptions.is_admin = null;
     }
 
@@ -662,6 +663,19 @@ export class UsersService {
   }
 
   async updateProfile(id: number, request: any) {
+    const create = await account.update(request, {
+      where: {
+        id,
+      },
+    });
+    // return create;
+
+    if (create) {
+      return {
+        status: 200,
+        message: 'Data Berhasil di Perbaharui',
+      };
+    }
     return {
       status: 400,
       message: 'UNDER MAINTENANCE',
