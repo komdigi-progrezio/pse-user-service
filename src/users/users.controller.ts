@@ -9,8 +9,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @MessagePattern('authUser')
-  auth(@Payload() username: any) {
-    return this.usersService.auth(username);
+  auth(@Payload() authUserDto: any) {
+    return this.usersService.auth(authUserDto);
   }
 
   @MessagePattern('setupAdmin')
