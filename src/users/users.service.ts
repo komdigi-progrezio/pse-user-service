@@ -613,7 +613,7 @@ export class UsersService {
   async update(id: number, updateUserDto: any) {
     try {
       const data = {
-        name: updateUserDto.name,
+        nama: updateUserDto.name,
         username: updateUserDto.username,
         status: updateUserDto.status,
         is_admin: 1,

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { account, permissions, role_has_permissions, roles } from 'models';
+import { updateSuccessResponse } from 'src/utils/updateSuccessResponse';
 import { Op } from 'sequelize';
 
 @Injectable()
@@ -187,8 +188,14 @@ export class PermissionsService {
     );
   }
 
-  update(id: number, updatePermissionDto: UpdatePermissionDto) {
-    return `This action updates a #${id} permission`;
+  async update(id: number, name: any) {
+    const inputData = { name: name };
+    const update = await permissions.update(inputData, {
+        where: {
+          id,
+        },
+      });
+    return updateSuccessResponse();
   }
 
   remove(id: number) {

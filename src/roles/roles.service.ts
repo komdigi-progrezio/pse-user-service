@@ -15,13 +15,31 @@ import { errorResponse } from 'src/utils/errorResponse';
 @Injectable()
 export class RolesService {
   async create(createRoleDto: any) {
-    try {
-      const data = await roles.create(createRoleDto);
+      const inputData = {
+        guard_name: 'api',
+        name: createRoleDto.name,
+        created_by: createRoleDto.user_id
+      };
+      const data = await roles.create( inputData );
+      for (let i = 0; i < createRoleDto.permissions.length; i++) {
+        const element = createRoleDto.permissions[i];
+        const permissionData = await permissions.findOne({
+          where: {
+            name: element,
+          },
+        });
+
+        await role_has_permissions.create({
+          role_id: data.id.toString(),
+          permission_id: permissionData.id,
+        });
+      }
 
       return {
-        status: 400,
-        message: 'UNDER MAINTENANCE',
+        status: 200,
+        message: 'Data Berhasil di Hapus',
       };
+    try {
     } catch (error) {
       return {
         status: 500,

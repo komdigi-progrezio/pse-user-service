@@ -28,10 +28,10 @@ export class PermissionsController {
   }
 
   @MessagePattern('updatePermission')
-  update(@Payload() updatePermissionDto: UpdatePermissionDto) {
+  update(@Payload() updatePermissionDto: any) {
     return this.permissionsService.update(
       updatePermissionDto.id,
-      updatePermissionDto,
+      updatePermissionDto.name,
     );
   }
 
