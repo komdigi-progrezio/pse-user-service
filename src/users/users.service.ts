@@ -25,7 +25,7 @@ export class UsersService {
     // 'last_login' => $this->last_login,
 
     const dataUser = await account.findOne({
-      where: { username: authUserDto }, 
+      where: { username: authUserDto },
       include: {
         model: account_roles,
         include: [
