@@ -295,7 +295,9 @@ export class UsersService {
       alamat: item.alamat ? item.alamat : 'Kosong',
       kota: item.kota,
       propinsi: item.propinsi,
-      roles: item.account_role.role ? [item.account_role.role.name] : [],
+      status_register: item.account_role.role
+        ? item.account_role.role.name
+        : 'Kosong', // harusnya roles
       instansi_induk_text: item.instansi_induk_text,
     }));
 
