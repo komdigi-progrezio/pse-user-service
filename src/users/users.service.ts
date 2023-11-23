@@ -14,6 +14,8 @@ import {
 } from 'models';
 import { Op } from 'sequelize';
 import { validate } from 'class-validator';
+import { formattedDate } from 'src/utils/formattedDate';
+import { createSuccessResponse } from 'src/utils/createSuccessResponse';
 
 @Injectable()
 export class UsersService {
@@ -173,44 +175,44 @@ export class UsersService {
       //   }
       // })
 
-      // const data = await account.create(request);
+      delete request._method;
+      delete request.id;
 
-      // const satuanKerja = request.satuan_kerja;
+      const data = await account.create(request);
 
-      // // Menggunakan Promise.all untuk menunggu semua operasi selesai
-      // await Promise.all(
-      //   satuanKerja.map(async (element: any) => {
-      //     const satuan_kerja = await account_satuan_kerja.findAll({
-      //       where: {
-      //         satuan_kerja_id: element,
-      //       },
-      //     });
-      //     if (satuan_kerja.length === 0) {
-      //       await account_satuan_kerja.create({
-      //         account_id: data.id,
-      //         satuan_kerja_id: element,
-      //       });
-      //     }
-      //   }),
-      // );
+      const satuanKerja = request.satuan_kerja;
 
-      // const subPejabatId = await roles.findOne({
-      //   where: {
-      //     name: 'Sub Pejabat',
-      //   },
-      // });
+      // Menggunakan Promise.all untuk menunggu semua operasi selesai
+      await Promise.all(
+        satuanKerja.map(async (element: any) => {
+          const satuan_kerja = await account_satuan_kerja.findAll({
+            where: {
+              satuan_kerja_id: element,
+            },
+          });
+          if (satuan_kerja.length === 0) {
+            await account_satuan_kerja.create({
+              account_id: data.id,
+              satuan_kerja_id: element,
+            });
+          }
+        }),
+      );
 
-      // // Menambahkan role 'Sub Pejabat' untuk akun yang baru dibuat
-      // await account_roles.create({
-      //   account_id: data.id,
-      //   role_id: subPejabatId.id,
-      // });
+      const subPejabatId = await roles.findOne({
+        where: {
+          name: 'Sub Pejabat',
+        },
+      });
+
+      // Menambahkan role 'Sub Pejabat' untuk akun yang baru dibuat
+      await account_roles.create({
+        account_id: data.id.toString(),
+        role_id: subPejabatId.id,
+      });
 
       // Mengembalikan data akun yang baru dibuat
-      return {
-        status: 400,
-        message: 'UNDER MAINTENANCE',
-      };
+      return createSuccessResponse();
     } catch (error) {
       // Menangkap dan mengembalikan pesan kesalahan jika terjadi kesalahan
       return {
@@ -220,7 +222,8 @@ export class UsersService {
     }
   }
 
-  async findAll(request: any) {
+  async findAll(request: any, account_id: number) {
+    console.log(account_id);
     const pageSize = 10; // Jumlah item per halaman
     const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
 
@@ -248,18 +251,25 @@ export class UsersService {
       }
     }
 
+    queryOptions.id = {
+      [Op.not]: account_id,
+    };
+
+    const rolesQueryOptions: any = {};
+
+    rolesQueryOptions['name'] = {
+      [Op.in]: ['Sub Pejabat', 'Pejabat'],
+    };
+
     const data = await account.findAll({
       include: [
         {
           model: account_roles,
+
           include: [
             {
               model: roles,
-              where: {
-                name: {
-                  [Op.in]: ['Sub Pejabat', 'Pejabat'],
-                },
-              },
+              where: rolesQueryOptions,
             },
           ],
         },
@@ -270,8 +280,27 @@ export class UsersService {
       offset: offset,
     });
 
+    const formattedData = data.map((item) => ({
+      id: item.id,
+      nama: item.nama,
+      email: item.email,
+      status: item.status,
+      nama_status: item.status === 1 ? 'Aktif' : 'Tidak Aktif',
+      username: item.username,
+      last_login: formattedDate(new Date(item.last_login)),
+      nip: item.nip,
+      jabatan: item.jabatan,
+      no_telepon: item.no_telepon,
+      satuan_kerja: item.satuan_kerja,
+      alamat: item.alamat ? item.alamat : 'Kosong',
+      kota: item.kota,
+      propinsi: item.propinsi,
+      roles: item.account_role.role ? [item.account_role.role.name] : [],
+      instansi_induk_text: item.instansi_induk_text,
+    }));
+
     return this.formatResponse(
-      data,
+      formattedData,
       queryOptions,
       page,
       pageSize,
@@ -413,8 +442,7 @@ export class UsersService {
 
     if (request.roles && request.roles === 'admin') {
       queryOptions.is_admin = 1;
-    } 
-    else {
+    } else {
       queryOptions.is_admin = null;
     }
 
