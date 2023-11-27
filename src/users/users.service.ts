@@ -73,6 +73,7 @@ export class UsersService {
         username: dataUser.username,
         nip: dataUser.nip,
         jabatan: dataUser.jabatan,
+        instansi_induk: dataUser.instansi_induk,
         no_telepon: dataUser.no_telepon,
         satuan_kerja: dataUser.satuan_kerja,
         alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
