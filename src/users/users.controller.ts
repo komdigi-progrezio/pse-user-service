@@ -31,9 +31,9 @@ export class UsersController {
     return this.usersService.storeParent(data);
   }
 
-  @MessagePattern('findAllUsers')
+  @MessagePattern('findAllUsersLog')
   findAll(@Payload() request: any) {
-    return this.usersService.findAll(request);
+    return this.usersService.findAll(request, request.account_id);
   }
 
   @MessagePattern('findAllUsersFilter')
