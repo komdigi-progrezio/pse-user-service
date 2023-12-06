@@ -213,7 +213,7 @@ export class UsersService {
       });
 
       // Mengembalikan data akun yang baru dibuat
-      return createSuccessResponse();
+      return createSuccessResponse(data.id);
     } catch (error) {
       // Menangkap dan mengembalikan pesan kesalahan jika terjadi kesalahan
       return {
