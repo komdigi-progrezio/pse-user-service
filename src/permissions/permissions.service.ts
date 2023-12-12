@@ -116,7 +116,7 @@ export class PermissionsService {
 
   async filterPermissions(request: any) {
     const pageSize = 10; // Jumlah item per halaman
-    const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
+    const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
     const offset = (page - 1) * pageSize;
 
     const queryOptions: any = {};
@@ -161,8 +161,10 @@ export class PermissionsService {
 
         const roles = [];
 
+        // console.log(item.role_has_permissions);
+
         item.role_has_permissions.forEach((element) => {
-          roles.push(element.role.name);
+          roles.push(element.role ? element.role.name : 'Kosong');
         });
 
         return {
@@ -191,10 +193,10 @@ export class PermissionsService {
   async update(id: number, name: any) {
     const inputData = { name: name };
     const update = await permissions.update(inputData, {
-        where: {
-          id,
-        },
-      });
+      where: {
+        id,
+      },
+    });
     return updateSuccessResponse();
   }
 
