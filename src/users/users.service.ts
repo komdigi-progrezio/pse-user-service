@@ -453,11 +453,16 @@ export class UsersService {
       queryOptions.status = request.status;
     }
 
-    if (request.filter && request.q) {
+    if (request.filter && request.q && request.filter !== 'instansi') {
       queryOptions[request.filter] = {
         [Op.iLike]: `%${request.q}%`,
       };
+    } else if (request.filter && request.q && request.filter === 'instansi') {
+      queryOptions['instansi_induk_text'] = {
+        [Op.iLike]: `%${request.q}%`,
+      };
     }
+
     const fromDate = request.created_at;
     const toDate = request.modified_at;
 
