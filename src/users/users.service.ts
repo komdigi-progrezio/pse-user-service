@@ -227,7 +227,7 @@ export class UsersService {
   async findAll(request: any, account_id: number) {
     console.log(account_id);
     const pageSize = 10; // Jumlah item per halaman
-    const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
+    const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
 
     const offset = (page - 1) * pageSize;
     const queryOptions: any = {};
@@ -398,7 +398,7 @@ export class UsersService {
 
   async parent(request: any) {
     const pageSize = 10; // Jumlah item per halaman
-    const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
+    const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
 
     const offset = (page - 1) * pageSize;
 
@@ -436,7 +436,7 @@ export class UsersService {
 
   async findAllFilter(request: any) {
     const pageSize = 10; // Jumlah item per halaman
-    const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
+    const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
     const offset = (page - 1) * pageSize;
     const queryOptions: any = {};
 
@@ -540,7 +540,7 @@ export class UsersService {
 
   async change(request: any) {
     const pageSize = 10; // Jumlah item per halaman
-    const page = request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
+    const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
     const agency = request.agency;
     const offset = (page - 1) * pageSize;
 
