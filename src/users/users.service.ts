@@ -75,7 +75,9 @@ export class UsersService {
         nip: dataUser.nip,
         jabatan: dataUser.jabatan,
         instansi_induk: dataUser.instansi_induk,
+        instansi_induk_text: dataUser.instansi_induk_text,
         no_telepon: dataUser.no_telepon,
+        no_hp: dataUser.no_hp,
         satuan_kerja: dataUser.satuan_kerja,
         alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
         kota: dataUser.kota,
@@ -454,11 +456,16 @@ export class UsersService {
       queryOptions.status = request.status;
     }
 
-    if (request.filter && request.q) {
+    if (request.filter && request.q && request.filter !== 'instansi') {
       queryOptions[request.filter] = {
         [Op.iLike]: `%${request.q}%`,
       };
+    } else if (request.filter && request.q && request.filter === 'instansi') {
+      queryOptions['instansi_induk_text'] = {
+        [Op.iLike]: `%${request.q}%`,
+      };
     }
+
     const fromDate = request.created_at;
     const toDate = request.modified_at;
 
@@ -505,6 +512,7 @@ export class UsersService {
       limit: pageSize,
       offset: offset,
       where: queryOptions,
+      order: [['modified_at', 'DESC']],
     });
 
     // return data;
@@ -695,23 +703,25 @@ export class UsersService {
   }
 
   async updateProfile(id: number, request: any) {
-    const create = await account.update(request, {
-      where: {
-        id,
-      },
-    });
-    // return create;
+    try {
+      delete request._method;
 
-    if (create) {
-      return {
-        status: 200,
-        message: 'Data Berhasil di Perbaharui',
-      };
+      const create = await account.update(request, {
+        where: {
+          id,
+        },
+      });
+      // return create;
+
+      if (create) {
+        return {
+          status: 200,
+          message: 'Data Berhasil di Perbaharui',
+        };
+      }
+    } catch (error) {
+      return this.errorResponse(error);
     }
-    return {
-      status: 400,
-      message: 'UNDER MAINTENANCE',
-    };
   }
 
   private async getAccountCount(queryOptions: any) {
@@ -723,5 +733,35 @@ export class UsersService {
     const oldId = request.old_id;
 
     return request;
+  }
+
+  async dropdown(request: any) {
+    try {
+      const queryOptions: any = {};
+
+      if (request.filter && request.q) {
+        queryOptions[request.filter] = {
+          [Op.iLike]: `%${request.q}}%`,
+        };
+      }
+
+      const data = await account.findAll({
+        where: queryOptions,
+      });
+
+      const formattedData = data.map((item) => ({
+        id: item.id,
+        username: item.username,
+        nama: item.nama,
+        status: item.status,
+        nama_status: item.status === 1 ? 'Aktif' : 'Tidak Aktif',
+      }));
+
+      return {
+        data: formattedData,
+      };
+    } catch (error) {
+      return this.errorResponse(error);
+    }
   }
 }

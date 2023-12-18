@@ -17,7 +17,13 @@ export interface user_fcm_tokensAttributes {
   user_id?: number;
 }
 
-@Table({ tableName: 'user_fcm_tokens', schema: 'public', timestamps: false })
+@Table({
+  tableName: 'user_fcm_tokens',
+  schema: 'public',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+})
 export class user_fcm_tokens
   extends Model<user_fcm_tokensAttributes, user_fcm_tokensAttributes>
   implements user_fcm_tokensAttributes

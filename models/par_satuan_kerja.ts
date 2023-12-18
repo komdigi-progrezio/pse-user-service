@@ -23,7 +23,13 @@ export interface par_satuan_kerjaAttributes {
   website?: string;
 }
 
-@Table({ tableName: 'par_satuan_kerja', schema: 'public', timestamps: false })
+@Table({
+  tableName: 'par_satuan_kerja',
+  schema: 'public',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'modified_at',
+})
 export class par_satuan_kerja
   extends Model<par_satuan_kerjaAttributes, par_satuan_kerjaAttributes>
   implements par_satuan_kerjaAttributes
