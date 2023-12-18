@@ -47,7 +47,7 @@ export interface accountAttributes {
   is_has_keycloak?: boolean;
 }
 
-@Table({ tableName: 'account', schema: 'public', timestamps: false })
+@Table({ tableName: 'account', schema: 'public', timestamps: true, createdAt: 'created_at', updatedAt: 'modified_at' })
 export class account
   extends Model<accountAttributes, accountAttributes>
   implements accountAttributes

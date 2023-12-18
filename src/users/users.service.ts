@@ -509,6 +509,7 @@ export class UsersService {
       limit: pageSize,
       offset: offset,
       where: queryOptions,
+      order: [['modified_at', 'DESC']],
     });
 
     // return data;

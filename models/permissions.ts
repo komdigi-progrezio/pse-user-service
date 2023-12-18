@@ -20,7 +20,13 @@ export interface permissionsAttributes {
   updated_by?: number;
 }
 
-@Table({ tableName: 'permissions', schema: 'public', timestamps: false })
+@Table({
+  tableName: 'permissions',
+  schema: 'public',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+})
 export class permissions
   extends Model<permissionsAttributes, permissionsAttributes>
   implements permissionsAttributes

@@ -22,7 +22,13 @@ export interface rolesAttributes {
   updated_by?: number;
 }
 
-@Table({ tableName: 'roles', schema: 'public', timestamps: false })
+@Table({
+  tableName: 'roles',
+  schema: 'public',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+})
 export class roles
   extends Model<rolesAttributes, rolesAttributes>
   implements rolesAttributes
