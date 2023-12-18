@@ -74,7 +74,9 @@ export class UsersService {
         nip: dataUser.nip,
         jabatan: dataUser.jabatan,
         instansi_induk: dataUser.instansi_induk,
+        instansi_induk_text: dataUser.instansi_induk_text,
         no_telepon: dataUser.no_telepon,
+        no_hp: dataUser.no_hp,
         satuan_kerja: dataUser.satuan_kerja,
         alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
         kota: dataUser.kota,
@@ -700,23 +702,25 @@ export class UsersService {
   }
 
   async updateProfile(id: number, request: any) {
-    const create = await account.update(request, {
-      where: {
-        id,
-      },
-    });
-    // return create;
+    try {
+      delete request._method;
 
-    if (create) {
-      return {
-        status: 200,
-        message: 'Data Berhasil di Perbaharui',
-      };
+      const create = await account.update(request, {
+        where: {
+          id,
+        },
+      });
+      // return create;
+
+      if (create) {
+        return {
+          status: 200,
+          message: 'Data Berhasil di Perbaharui',
+        };
+      }
+    } catch (error) {
+      return this.errorResponse(error);
     }
-    return {
-      status: 400,
-      message: 'UNDER MAINTENANCE',
-    };
   }
 
   private async getAccountCount(queryOptions: any) {
