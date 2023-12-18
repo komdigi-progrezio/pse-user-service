@@ -733,4 +733,34 @@ export class UsersService {
 
     return request;
   }
+
+  async dropdown(request: any) {
+    try {
+      const queryOptions: any = {};
+
+      if (request.filter && request.q) {
+        queryOptions[request.filter] = {
+          [Op.iLike]: `%${request.q}}%`,
+        };
+      }
+
+      const data = await account.findAll({
+        where: queryOptions,
+      });
+
+      const formattedData = data.map((item) => ({
+        id: item.id,
+        username: item.username,
+        nama: item.nama,
+        status: item.status,
+        nama_status: item.status === 1 ? 'Aktif' : 'Tidak Aktif',
+      }));
+
+      return {
+        data: formattedData,
+      };
+    } catch (error) {
+      return this.errorResponse(error);
+    }
+  }
 }

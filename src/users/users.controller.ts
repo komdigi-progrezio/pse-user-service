@@ -119,4 +119,9 @@ export class UsersController {
   updateProfile(@Payload() updateProfile: any) {
     return this.usersService.updateProfile(updateProfile.id, updateProfile);
   }
+
+  @MessagePattern('dropdownUser')
+  dropdown(@Payload() request: any) {
+    return this.usersService.dropdown(request);
+  }
 }
