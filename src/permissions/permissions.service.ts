@@ -173,8 +173,8 @@ export class PermissionsService {
           guard_name: item.guard_name,
           created_at: item.created_at,
           updated_at: item.updated_at,
-          created_by: createdBy ? createdBy.nama : null,
-          updated_by: updatedBy ? updatedBy.nama : null,
+          created_by: createdBy ? createdBy.nama : 'Kosong',
+          updated_by: updatedBy ? updatedBy.nama : 'Kosong',
           roles,
         };
       }),
