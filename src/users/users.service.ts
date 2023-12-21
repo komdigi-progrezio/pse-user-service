@@ -741,7 +741,7 @@ export class UsersService {
 
       if (request.filter && request.q) {
         queryOptions[request.filter] = {
-          [Op.iLike]: `%${request.q}}%`,
+          [Op.iLike]: `%${decodeURIComponent(request.q)}%`,
         };
       }
 
