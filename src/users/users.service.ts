@@ -170,7 +170,7 @@ export class UsersService {
     }
   }
 
-  async storeParent(request: any) {
+  async storeParent(request: any, account_id: number) {
     try {
       // const satuanKerjaText = await par_satuan_kerja.findOne({
       //   where:{
@@ -181,7 +181,20 @@ export class UsersService {
       delete request._method;
       delete request.id;
 
-      const data = await account.create(request);
+      const satuanKerjaNama = await par_satuan_kerja.findByPk(
+        request.satuan_kerja[0],
+      );
+
+      const data = await account.create({
+        username: request.username,
+        nama: request.nama,
+        nip: request.nip,
+        jabatan: request.jabatan,
+        no_telepon: request.no_telepon,
+        no_hp: request.no_hp,
+        satuan_kerja: satuanKerjaNama.name,
+        parent_id: account_id,
+      });
 
       const satuanKerja = request.satuan_kerja;
 
@@ -190,13 +203,14 @@ export class UsersService {
         satuanKerja.map(async (element: any) => {
           const satuan_kerja = await account_satuan_kerja.findAll({
             where: {
-              satuan_kerja_id: element,
+              satuan_kerja_id: +element,
             },
           });
           if (satuan_kerja.length === 0) {
+            console.log('first', typeof +data.id);
             await account_satuan_kerja.create({
               account_id: data.id,
-              satuan_kerja_id: element,
+              satuan_kerja_id: +element,
             });
           }
         }),
