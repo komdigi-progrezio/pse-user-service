@@ -28,7 +28,8 @@ export class UsersController {
   }
   @MessagePattern('storeParent')
   storeParent(@Payload() data: any) {
-    return this.usersService.storeParent(data);
+    const account_id = data.account_id;
+    return this.usersService.storeParent(data, account_id);
   }
 
   @MessagePattern('findAllUsersLog')
