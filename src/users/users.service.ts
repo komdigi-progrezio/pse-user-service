@@ -680,7 +680,7 @@ export class UsersService {
       url_dokumen: data.dokumen,
       created_at: data.created_at,
       modified_at: data.modified_at,
-      status: data.status,
+      status: data.status ? data.status : 0,
       nama_status: data.status === 1 ? 'Aktif' : 'Tidak Aktif',
       nama_provinsi: data.propinsi,
 
