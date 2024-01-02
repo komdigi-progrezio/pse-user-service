@@ -1,0 +1,52 @@
+{
+  "data": {
+    "id": 825,
+    "username": "lukman.andre4@gmail.com",
+    "password": null,
+    "nama": "Lukman Andri",
+    "nip": "198306212008041001",
+    "jabatan": "Pranata Komputer Ahli Muda",
+    "email": null,
+    "no_telepon": "0271",
+    "satuan_kerja": "Kosong",
+    "alamat": "JL. Raya Sukowati No.225",
+    "kota": "SRAGEN",
+    "propinsi": "JAWA TENGAH",
+    "kode_pos": null,
+    "instansi_induk": 302,
+    "dokumen": "dokumen_pejabat_d3gylpor.pdf",
+    "created_at": "2023-09-20T06:30:40.000Z",
+    "modified_at": "2023-09-20T06:30:40.000Z",
+    "status": 0,
+    "keycode": null,
+    "last_login": null,
+    "ip_address": null,
+    "instansi_induk_text": "Pemerintah Kabupaten Sragen",
+    "is_admin": null,
+    "parent_id": null,
+    "last_logout": null,
+    "status_register": 2,
+    "replace_by_account_id": null,
+    "user_report": null,
+    "no_hp": "085725398565",
+    "is_active": true,
+    "deleted_at": null,
+    "gitlab_user_id": null,
+    "keycloak_id": null,
+    "is_has_keycloak": null,
+    "account_role": {
+      "role_id": "3",
+      "account_id": "825",
+      "id": 526,
+      "role": {
+        "id": "3",
+        "name": "Pejabat",
+        "guard_name": "api",
+        "created_at": "2021-02-10T05:38:08.000Z",
+        "updated_at": "2023-12-26T19:31:45.000Z",
+        "created_by": 4,
+        "updated_by": 4
+      }
+    }
+  }
+}

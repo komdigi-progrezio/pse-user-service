@@ -5,6 +5,9 @@ import {
   account,
   account_roles,
   account_satuan_kerja,
+  par_instansi,
+  par_kota,
+  par_propinsi,
   par_satuan_kerja,
   permissions,
   role_has_permissions,
@@ -643,8 +646,63 @@ export class UsersService {
       },
     });
 
+    let alamatInstansi: par_instansi;
+
+    if (data.alamat) {
+    } else {
+      alamatInstansi = await par_instansi.findByPk(data.instansi_induk);
+      data.alamat = alamatInstansi ? alamatInstansi.alamat : 'Kosong';
+      const kotaInstansi = await par_kota.findByPk(data.kota);
+      data.kota = kotaInstansi ? kotaInstansi.nama : 'Kosong';
+      const propinsiInstansi = await par_propinsi.findByPk(data.propinsi);
+      data.propinsi = propinsiInstansi ? propinsiInstansi.nama : 'Kosong';
+      data.kode_pos = alamatInstansi ? alamatInstansi.kode_pos : 'Kosong';
+    }
+
+    data.satuan_kerja = data.satuan_kerja ? data.satuan_kerja : 'Kosong';
+
+    const formattedData = {
+      id: data.id,
+      username: data.username,
+
+      nama: data.nama,
+      nip: data.nip,
+      jabatan: data.jabatan,
+      email: data.email,
+      no_telepon: data.no_telepon,
+      satuan_kerja: data.satuan_kerja,
+      alamat: data.alamat,
+      kota: data.kota,
+      nama_kota: data.kota,
+      propinsi: data.propinsi,
+      kode_pos: data.kode_pos,
+      instansi_induk: data.instansi_induk,
+      dokumen: data.dokumen,
+      url_dokumen: data.dokumen,
+      created_at: formattedDate(data.created_at),
+      modified_at: formattedDate(data.modified_at),
+      status: data.status ? data.status : 0,
+      nama_status: data.status === 1 ? 'Aktif' : 'Tidak Aktif',
+      nama_provinsi: data.propinsi,
+
+      instansi_induk_text: data.instansi_induk_text,
+      nama_instansi: data.instansi_induk_text,
+      is_admin: null,
+      parent_id: null,
+      last_logout: null,
+      status_register: 2,
+      replace_by_account_id: null,
+      user_report: null,
+      no_hp: data.no_hp,
+      is_active: true,
+      deleted_at: null,
+      gitlab_user_id: null,
+      keycloak_id: null,
+      is_has_keycloak: null,
+    };
+
     return {
-      data,
+      data: formattedData,
     };
   }
 
@@ -655,12 +713,69 @@ export class UsersService {
     queryOptions.instansi_induk = findUser.instansi_induk;
     queryOptions.status_register = 1;
 
-    const data = await account.findAll({
+    const item = await account.findAll({
       where: queryOptions,
     });
 
+    const data: any = item.length > 0 ? item[0] : {};
+
+    let alamatInstansi: par_instansi;
+
+    if (data.alamat) {
+    } else {
+      alamatInstansi = await par_instansi.findByPk(data.instansi_induk);
+      data.alamat = alamatInstansi ? alamatInstansi.alamat : 'Kosong';
+      const kotaInstansi = await par_kota.findByPk(data.kota);
+      data.kota = kotaInstansi ? kotaInstansi.nama : 'Kosong';
+      const propinsiInstansi = await par_propinsi.findByPk(data.propinsi);
+      data.propinsi = propinsiInstansi ? propinsiInstansi.nama : 'Kosong';
+      data.kode_pos = alamatInstansi ? alamatInstansi.kode_pos : 'Kosong';
+    }
+
+    data.satuan_kerja = data.satuan_kerja ? data.satuan_kerja : 'Kosong';
+
+    const formattedData = {
+      id: data.id,
+      username: data.username,
+
+      nama: data.nama,
+      nip: data.nip,
+      jabatan: data.jabatan,
+      email: data.email,
+      no_telepon: data.no_telepon,
+      satuan_kerja: data.satuan_kerja,
+      alamat: data.alamat,
+      kota: data.kota,
+      nama_kota: data.kota,
+      propinsi: data.propinsi,
+      kode_pos: data.kode_pos,
+      instansi_induk: data.instansi_induk,
+      dokumen: data.dokumen,
+      url_dokumen: data.dokumen,
+      created_at: data.created_at,
+      modified_at: data.modified_at,
+      status: data.status,
+      nama_status: data.status === 1 ? 'Aktif' : 'Tidak Aktif',
+      nama_provinsi: data.propinsi,
+
+      instansi_induk_text: data.instansi_induk_text,
+      nama_instansi: data.instansi_induk_text,
+      is_admin: null,
+      parent_id: null,
+      last_logout: null,
+      status_register: 2,
+      replace_by_account_id: null,
+      user_report: null,
+      no_hp: data.no_hp,
+      is_active: true,
+      deleted_at: null,
+      gitlab_user_id: null,
+      keycloak_id: null,
+      is_has_keycloak: null,
+    };
+
     return {
-      data: data[0],
+      data: formattedData,
     };
   }
 
