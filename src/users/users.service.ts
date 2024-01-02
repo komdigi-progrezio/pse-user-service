@@ -457,6 +457,16 @@ export class UsersService {
     const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
     const offset = (page - 1) * pageSize;
     const queryOptions: any = {};
+    const orderData = request.orderData || 'DESC';
+    let qUpdateDaftar: string;
+
+    if (request.q === 'daftar') {
+      qUpdateDaftar = 'created_at';
+    } else if (request.q === 'update') {
+      qUpdateDaftar = 'modified_at';
+    } else {
+      qUpdateDaftar = 'modified_at';
+    }
 
     if (request.email) {
       queryOptions.username = request.email;
@@ -528,7 +538,7 @@ export class UsersService {
       limit: pageSize,
       offset: offset,
       where: queryOptions,
-      order: [['modified_at', 'DESC']],
+      order: [[qUpdateDaftar, orderData]],
     });
 
     // return data;
