@@ -334,16 +334,18 @@ export class UsersService {
 
   async changeStatusUser(request: any) {
     try {
-      const result = await account.update(
-        {
-          status: request.status === 'enable' ? 1 : 0,
-        },
-        {
+      let query = {
+        status: request.status === 'enable' ? 1 : 0,
+      };
+      if (request.status === 'enable') {
+        query['keycloak_id'] = request.keycloakId;
+        query['is_has_keycloak'] = true;
+      };
+        const result = await account.update(query, {
           where: {
             id: request.id,
           },
-        },
-      );
+        });
 
       if (result[0] === 1) {
         return {
