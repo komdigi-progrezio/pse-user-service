@@ -195,6 +195,7 @@ export class UsersService {
         jabatan: request.jabatan,
         no_telepon: request.no_telepon,
         no_hp: request.no_hp,
+        instansi_induk: request.instansi_induk,
         satuan_kerja: satuanKerjaNama.name,
         parent_id: account_id,
       });
