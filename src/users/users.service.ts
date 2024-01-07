@@ -583,7 +583,9 @@ export class UsersService {
 
     const queryOptions: any = {};
     queryOptions.status_register = 2;
-    queryOptions.status = [0, null];
+    queryOptions.status = {
+      [Op.or]: [0, null],
+    };
 
     // return request.roles;
 
