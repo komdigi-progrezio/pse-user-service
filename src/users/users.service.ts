@@ -12,6 +12,7 @@ import {
   permissions,
   role_has_permissions,
   roles,
+  sis_profil,
   user_fcm_tokens,
   users,
 } from 'models';
@@ -875,7 +876,35 @@ export class UsersService {
     const newId = request.new_id;
     const oldId = request.old_id;
 
-    return request;
+    if (oldId) {
+      try {
+        const oldUser = await account.findByPk(oldId);
+        if (oldUser) {
+          await account.update(
+            {
+              status: 0,
+              status_register: 1,
+              replace_by_account_id: newId,
+            },
+            { where: { id: oldId } },
+          );
+
+          await sis_profil.update(
+            {
+              account_id: newId,
+            },
+            { where: { account_id: oldId } },
+          );
+        }
+      } catch (error) {
+       return this.errorResponse(error);
+      }
+    }
+
+    return {
+      status: 200,
+      message: 'Data Berhasil di Setujui',
+    };
   }
 
   async dropdown(request: any) {

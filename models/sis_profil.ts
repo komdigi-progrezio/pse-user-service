@@ -44,7 +44,13 @@ export interface sis_profilAttributes {
   approved_publish_date?: Date;
 }
 
-@Table({ tableName: 'sis_profil', schema: 'public', timestamps: false })
+@Table({
+  tableName: 'sis_profil',
+  schema: 'public',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'modified_at',
+})
 export class sis_profil
   extends Model<sis_profilAttributes, sis_profilAttributes>
   implements sis_profilAttributes

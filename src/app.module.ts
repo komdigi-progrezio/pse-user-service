@@ -12,6 +12,7 @@ import {
   permissions,
   role_has_permissions,
   roles,
+  sis_profil,
   user_fcm_tokens,
   users,
 } from 'models';
@@ -44,6 +45,7 @@ import { PermissionsModule } from './permissions/permissions.module';
       par_instansi,
       par_kota,
       par_propinsi,
+      sis_profil,
     ]),
     UsersModule,
     RolesModule,
