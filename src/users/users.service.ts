@@ -12,6 +12,7 @@ import {
   permissions,
   role_has_permissions,
   roles,
+  sis_profil,
   user_fcm_tokens,
   users,
 } from 'models';
@@ -196,6 +197,7 @@ export class UsersService {
         jabatan: request.jabatan,
         no_telepon: request.no_telepon,
         no_hp: request.no_hp,
+        instansi_induk: request.instansi_induk,
         satuan_kerja: satuanKerjaNama.name,
         parent_id: account_id,
       });
@@ -583,7 +585,9 @@ export class UsersService {
 
     const queryOptions: any = {};
     queryOptions.status_register = 2;
-    queryOptions.status = [0, null];
+    queryOptions.status = {
+      [Op.or]: [0, null],
+    };
 
     // return request.roles;
 
@@ -873,7 +877,35 @@ export class UsersService {
     const newId = request.new_id;
     const oldId = request.old_id;
 
-    return request;
+    if (oldId) {
+      try {
+        const oldUser = await account.findByPk(oldId);
+        if (oldUser) {
+          await account.update(
+            {
+              status: 0,
+              status_register: 1,
+              replace_by_account_id: newId,
+            },
+            { where: { id: oldId } },
+          );
+
+          await sis_profil.update(
+            {
+              account_id: newId,
+            },
+            { where: { account_id: oldId } },
+          );
+        }
+      } catch (error) {
+       return this.errorResponse(error);
+      }
+    }
+
+    return {
+      status: 200,
+      message: 'Data Berhasil di Setujui',
+    };
   }
 
   async dropdown(request: any) {
