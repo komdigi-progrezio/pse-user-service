@@ -31,6 +31,7 @@ import { PermissionsModule } from './permissions/permissions.module';
       models: [],
       autoLoadModels: true,
       synchronize: true,
+      timezone: '+07:00',
     }),
     SequelizeModule.forFeature([
       users,

@@ -341,12 +341,12 @@ export class UsersService {
       if (request.status === 'enable') {
         query['keycloak_id'] = request.keycloakId;
         query['is_has_keycloak'] = true;
-      };
-        const result = await account.update(query, {
-          where: {
-            id: request.id,
-          },
-        });
+      }
+      const result = await account.update(query, {
+        where: {
+          id: request.id,
+        },
+      });
 
       if (result[0] === 1) {
         return {
@@ -616,7 +616,7 @@ export class UsersService {
 
     const formattedData = await Promise.all(
       data.map(async (item) => {
-        const oldname = await account.findOne({
+        const old_name = await account.findOne({
           where: {
             instansi_induk: item.instansi_induk,
             status_register: 1,
@@ -631,7 +631,7 @@ export class UsersService {
           status: item.status,
           nama_status: item.status === 0 ? 'tidak Aktif' : 'aktif',
           instansi_induk: item.instansi_induk,
-          oldname,
+          old_name,
 
           nama_instansi: item.instansi_induk_text,
           created_at: item.created_at,
@@ -897,7 +897,7 @@ export class UsersService {
           );
         }
       } catch (error) {
-       return this.errorResponse(error);
+        return this.errorResponse(error);
       }
     }
 
