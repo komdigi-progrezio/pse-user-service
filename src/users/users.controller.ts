@@ -43,7 +43,9 @@ export class UsersController {
   }
   @MessagePattern('findChangeUsersFilter')
   change(@Payload() data: any) {
-    return this.usersService.change(data);
+    const account_id = data.account_id;
+
+    return this.usersService.change(data, account_id);
   }
   @MessagePattern('newManager')
   newManager(@Payload() id: any) {

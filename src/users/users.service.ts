@@ -576,7 +576,7 @@ export class UsersService {
     );
   }
 
-  async change(request: any) {
+  async change(request: any, account_id: number) {
     const pageSize = 10; // Jumlah item per halaman
     const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
     const agency = request.agency;
@@ -584,6 +584,7 @@ export class UsersService {
 
     const queryOptions: any = {};
     queryOptions.status_register = 2;
+
     queryOptions.status = {
       [Op.or]: [0, null],
     };
