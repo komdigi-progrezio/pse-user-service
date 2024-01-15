@@ -630,7 +630,8 @@ export class UsersService {
           nip: item.nip,
           jabatan: item.jabatan,
           status: item.status,
-          nama_status: item.status === 0 ? 'tidak Aktif' : 'aktif',
+          nama_status:
+            item.status === 0 || item.status === null ? 'tidak Aktif' : 'aktif',
           instansi_induk: item.instansi_induk,
           old_name,
 
