@@ -625,6 +625,7 @@ export class UsersService {
         roles: item.account_role ? [item.account_role.role.name] : [''],
         created_at: this.formatISOStringToDMYHI(item.created_at),
         modified_at: this.formatISOStringToDMYHI(item.modified_at),
+        is_notify: item.is_notify ? 'Ya' : 'Tidak',
       };
     });
 
@@ -860,10 +861,22 @@ export class UsersService {
 
   async update(id: number, updateUserDto: any) {
     try {
+      const isNotify = updateUserDto.is_notify == 'Ya' ? true : false;
+
+      if (isNotify) {
+        const notifiedAccounts = await account.findAll({where: {is_notify: true}});
+        if (notifiedAccounts.length >= 5) {
+          throw new Error(
+            'Tidak bisa merubah account karena account di notifikasi sudah melebihi 5 account',
+          );
+        }
+      }
+
       const data = {
         nama: updateUserDto.name,
         username: updateUserDto.username,
         status: updateUserDto.status,
+        is_notify: isNotify,
         is_admin: 1,
       };
 
