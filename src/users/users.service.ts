@@ -492,6 +492,17 @@ export class UsersService {
       queryOptions.parent_id = request.parent_id;
     }
 
+    if (
+      request.filter &&
+      request.filter !== null &&
+      request.q &&
+      request.q !== null
+    ) {
+      queryOptions[request.filter] = {
+        [Op.iLike]: `%${request.q}%`,
+      };
+    }
+
     const data = await account.findAll({
       where: queryOptions,
       limit: pageSize,
