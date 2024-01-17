@@ -90,6 +90,68 @@ export class UsersService {
       },
     };
   }
+
+  async getProfil(account_id: any) {
+    const dataUser = await account.findOne({
+      where: { id: account_id },
+      include: {
+        model: account_roles,
+        include: [
+          {
+            model: roles,
+            include: [
+              {
+                model: role_has_permissions,
+                include: [
+                  {
+                    model: permissions,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    // return dataUser;
+
+    const permissionsData = [];
+
+    for (
+      let i = 0;
+      i < dataUser.account_role.role.role_has_permissions.length;
+      i++
+    ) {
+      const element = dataUser.account_role.role.role_has_permissions[i];
+      permissionsData.push(element.permission.name);
+    }
+
+    // return permissionsData;
+
+    return {
+      data: {
+        id: dataUser.id,
+        nama: dataUser.nama,
+        email: dataUser.email,
+        status: dataUser.status,
+        nama_status: dataUser.status === 1 ? 'Aktif' : 'Tidak Aktif',
+        username: dataUser.username,
+        nip: dataUser.nip,
+        jabatan: dataUser.jabatan,
+        instansi_induk: dataUser.instansi_induk,
+        instansi_induk_text: dataUser.instansi_induk_text,
+        no_telepon: dataUser.no_telepon,
+        no_hp: dataUser.no_hp,
+        satuan_kerja: dataUser.satuan_kerja,
+        alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
+        kota: dataUser.kota,
+        propinsi: dataUser.propinsi,
+        roles: [dataUser.account_role.role.name],
+        permissions: permissionsData,
+      },
+    };
+  }
   private errorResponse(error) {
     return {
       status: 500,

@@ -13,6 +13,10 @@ export class UsersController {
   auth(@Payload() authUserDto: any) {
     return this.usersService.auth(authUserDto);
   }
+  @MessagePattern('getProfilUser')
+  getProfil(@Payload() account_id: any) {
+    return this.usersService.getProfil(account_id);
+  }
 
   @MessagePattern('setupAdmin')
   setupAdmin() {
