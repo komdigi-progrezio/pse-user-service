@@ -577,7 +577,7 @@ export class UsersService {
     );
   }
 
-  async change(request: any) {
+  async change(request: any, account_id: number) {
     const pageSize = 10; // Jumlah item per halaman
     const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
     const agency = request.agency;
@@ -585,6 +585,7 @@ export class UsersService {
 
     const queryOptions: any = {};
     queryOptions.status_register = 2;
+
     queryOptions.status = {
       [Op.or]: [0, null],
     };
@@ -630,7 +631,8 @@ export class UsersService {
           nip: item.nip,
           jabatan: item.jabatan,
           status: item.status,
-          nama_status: item.status === 0 ? 'tidak Aktif' : 'aktif',
+          nama_status:
+            item.status === 0 || item.status === null ? 'tidak Aktif' : 'aktif',
           instansi_induk: item.instansi_induk,
           old_name,
 
