@@ -91,6 +91,68 @@ export class UsersService {
       },
     };
   }
+
+  async getProfil(account_id: any) {
+    const dataUser = await account.findOne({
+      where: { id: account_id },
+      include: {
+        model: account_roles,
+        include: [
+          {
+            model: roles,
+            include: [
+              {
+                model: role_has_permissions,
+                include: [
+                  {
+                    model: permissions,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    // return dataUser;
+
+    const permissionsData = [];
+
+    for (
+      let i = 0;
+      i < dataUser.account_role.role.role_has_permissions.length;
+      i++
+    ) {
+      const element = dataUser.account_role.role.role_has_permissions[i];
+      permissionsData.push(element.permission.name);
+    }
+
+    // return permissionsData;
+
+    return {
+      data: {
+        id: dataUser.id,
+        nama: dataUser.nama,
+        email: dataUser.email,
+        status: dataUser.status,
+        nama_status: dataUser.status === 1 ? 'Aktif' : 'Tidak Aktif',
+        username: dataUser.username,
+        nip: dataUser.nip,
+        jabatan: dataUser.jabatan,
+        instansi_induk: dataUser.instansi_induk,
+        instansi_induk_text: dataUser.instansi_induk_text,
+        no_telepon: dataUser.no_telepon,
+        no_hp: dataUser.no_hp,
+        satuan_kerja: dataUser.satuan_kerja,
+        alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
+        kota: dataUser.kota,
+        propinsi: dataUser.propinsi,
+        roles: [dataUser.account_role.role.name],
+        permissions: permissionsData,
+      },
+    };
+  }
   private errorResponse(error) {
     return {
       status: 500,
@@ -431,6 +493,17 @@ export class UsersService {
       queryOptions.parent_id = request.parent_id;
     }
 
+    if (
+      request.filter &&
+      request.filter !== null &&
+      request.q &&
+      request.q !== null
+    ) {
+      queryOptions[request.filter] = {
+        [Op.iLike]: `%${request.q}%`,
+      };
+    }
+
     const data = await account.findAll({
       where: queryOptions,
       limit: pageSize,
@@ -564,6 +637,7 @@ export class UsersService {
         roles: item.account_role ? [item.account_role.role.name] : [''],
         created_at: this.formatISOStringToDMYHI(item.created_at),
         modified_at: this.formatISOStringToDMYHI(item.modified_at),
+        is_notify: item.is_notify ? 'Ya' : 'Tidak',
       };
     });
 
@@ -799,10 +873,22 @@ export class UsersService {
 
   async update(id: number, updateUserDto: any) {
     try {
+      const isNotify = updateUserDto.is_notify == 'Ya' ? true : false;
+
+      if (isNotify) {
+        const notifiedAccounts = await account.findAll({where: {is_notify: true}});
+        if (notifiedAccounts.length >= 5) {
+          throw new Error(
+            'Tidak bisa merubah account karena account di notifikasi sudah melebihi 5 account',
+          );
+        }
+      }
+
       const data = {
         nama: updateUserDto.name,
         username: updateUserDto.username,
         status: updateUserDto.status,
+        is_notify: isNotify,
         is_admin: 1,
       };
 

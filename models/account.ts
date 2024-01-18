@@ -45,6 +45,7 @@ export interface accountAttributes {
   gitlab_user_id?: number;
   keycloak_id?: string;
   is_has_keycloak?: boolean;
+  is_notify?: boolean;
 }
 
 @Table({ tableName: 'account', schema: 'public', timestamps: true, createdAt: 'created_at', updatedAt: 'modified_at' })
@@ -167,4 +168,7 @@ export class account
 
   @HasOne(() => account_roles, { sourceKey: 'id' })
   account_role?: account_roles;
+
+  @Column({ allowNull: true, type: DataType.BOOLEAN })
+  is_notify?: boolean;
 }
