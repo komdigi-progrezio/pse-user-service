@@ -875,7 +875,12 @@ export class UsersService {
       const isNotify = updateUserDto.is_notify == 'Ya' ? true : false;
 
       if (isNotify) {
-        const notifiedAccounts = await account.findAll({where: {is_notify: true}});
+        const notifiedAccounts = await account.findAll({
+          where: {
+            is_notify: true,
+            is_admin: 1,
+         },
+        });
         if (notifiedAccounts.length >= 5) {
           throw new Error(
             'Tidak bisa merubah account karena account di notifikasi sudah melebihi 5 account',
