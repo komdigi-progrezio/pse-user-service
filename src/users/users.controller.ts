@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { request } from 'http';
+import * as fs from 'fs/promises'; // Modul fs dari Node.js versi 14 ke atas
 
 @Controller()
 export class UsersController {
@@ -31,8 +32,30 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
   @MessagePattern('storeParent')
-  storeParent(@Payload() data: any) {
+  storeParent(@Payload() storeParentDto: any) {
+    const data: any = storeParentDto.body;
+
     const account_id = data.account_id;
+
+    delete storeParentDto.body;
+
+    const buffer = Buffer.from(storeParentDto.buffer.data);
+
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+
+    for (let i = 0; i < 9; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
+    }
+
+    const nama_document = `dokumen_pejabat_${result}.pdf`;
+
+    // Tulis buffer ke dalam file
+    fs.writeFile(`assets/document/${nama_document}`, buffer);
+
+    data.dokumen = nama_document;
+
     return this.usersService.storeParent(data, account_id);
   }
 

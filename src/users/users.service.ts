@@ -251,6 +251,9 @@ export class UsersService {
       const satuanKerjaNama = await par_satuan_kerja.findByPk(
         request.satuan_kerja[0],
       );
+      const instansiInduk = await par_instansi.findByPk(
+        +request.instansi_induk,
+      );
 
       const data = await account.create({
         username: request.username,
@@ -259,9 +262,11 @@ export class UsersService {
         jabatan: request.jabatan,
         no_telepon: request.no_telepon,
         no_hp: request.no_hp,
-        instansi_induk: request.instansi_induk,
+        instansi_induk: +request.instansi_induk,
+        instansi_induk_text: instansiInduk ? instansiInduk.name : null,
         satuan_kerja: satuanKerjaNama.name,
         parent_id: account_id,
+        dokumen: request.dokumen,
       });
 
       const satuanKerja = request.satuan_kerja;
@@ -880,7 +885,7 @@ export class UsersService {
           where: {
             is_notify: true,
             is_admin: 1,
-         },
+          },
         });
         if (notifiedAccounts.length >= 5) {
           throw new Error(
