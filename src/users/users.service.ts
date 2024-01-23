@@ -209,10 +209,26 @@ export class UsersService {
 
   async create(createUserDto: any) {
     try {
+      const isNotify = createUserDto.is_notify == 'Ya' ? true : false;
+      if (isNotify) {
+        const notifiedAccounts = await account.findAll({
+          where: {
+            is_notify: true,
+            is_admin: 1,
+          },
+        });
+        if (notifiedAccounts.length >= 5) {
+          throw new Error(
+            'Tidak bisa merubah account karena account di notifikasi sudah melebihi 5 account',
+          );
+        }
+      }
+
       const data = {
         nama: createUserDto.name,
         username: createUserDto.username,
         status: createUserDto.status,
+        is_notify: isNotify,
         is_admin: 1,
       };
       const create = await account.create(data);
