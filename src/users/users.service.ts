@@ -21,6 +21,9 @@ import { validate } from 'class-validator';
 import { formattedDate } from 'src/utils/formattedDate';
 import { createSuccessResponse } from 'src/utils/createSuccessResponse';
 
+import * as fs from 'fs';
+const axios = require('axios');
+
 @Injectable()
 export class UsersService {
   async auth(authUserDto: any) {
@@ -207,10 +210,26 @@ export class UsersService {
 
   async create(createUserDto: any) {
     try {
+      const isNotify = createUserDto.is_notify == 'Ya' ? true : false;
+      if (isNotify) {
+        const notifiedAccounts = await account.findAll({
+          where: {
+            is_notify: true,
+            is_admin: 1,
+          },
+        });
+        if (notifiedAccounts.length >= 5) {
+          throw new Error(
+            'Tidak bisa merubah account karena account di notifikasi sudah melebihi 5 account',
+          );
+        }
+      }
+
       const data = {
         nama: createUserDto.name,
         username: createUserDto.username,
         status: createUserDto.status,
+        is_notify: isNotify,
         is_admin: 1,
       };
       const create = await account.create(data);
@@ -775,7 +794,8 @@ export class UsersService {
       kode_pos: data.kode_pos,
       instansi_induk: data.instansi_induk,
       dokumen: data.dokumen,
-      url_dokumen: data.dokumen,
+      url_dokumen:
+        process.env.APP_DOMAIN + '/api/storage/dokumen_pejabat/' + data.dokumen,
       created_at: formattedDate(data.created_at),
       modified_at: formattedDate(data.modified_at),
       status: data.status ? data.status : 0,
@@ -1034,5 +1054,26 @@ export class UsersService {
     } catch (error) {
       return this.errorResponse(error);
     }
+  }
+  async getDocumentPejabat(data: any) {
+    const documentPath = `assets/document/${data.document}`;
+
+    console.log(documentPath);
+
+    let document: any;
+    if (!fs.existsSync(documentPath)) {
+      // ambil badge optional dari api-dev
+
+      const response = await axios.get(
+        `https://api.dev.layanan.go.id/pse-api/storage/${data.id}/${data.document}`,
+        {
+          responseType: 'arraybuffer',
+        },
+      );
+      document = response.data || null;
+    } else {
+      document = fs.readFileSync(documentPath);
+    }
+    return { name: data.document, value: document };
   }
 }

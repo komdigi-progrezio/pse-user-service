@@ -154,4 +154,11 @@ export class UsersController {
   dropdown(@Payload() request: any) {
     return this.usersService.dropdown(request);
   }
+
+  @MessagePattern('getDocumentPejabat')
+  getDocumentPejabat(@Payload() data: string) {
+    console.log('datassssss', data);
+
+    return this.usersService.getDocumentPejabat(data);
+  }
 }
