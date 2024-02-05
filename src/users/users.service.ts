@@ -680,6 +680,7 @@ export class UsersService {
     const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
     const agency = request.agency;
     const offset = (page - 1) * pageSize;
+    const orderData = request.orderData || 'DESC';
 
     const queryOptions: any = {};
     queryOptions.status_register = 2;
@@ -710,6 +711,7 @@ export class UsersService {
       limit: pageSize,
       offset: offset,
       where: queryOptions,
+      order: [['created_at', orderData]],
     });
 
     // return data;
