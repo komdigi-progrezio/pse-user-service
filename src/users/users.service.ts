@@ -1056,25 +1056,4 @@ export class UsersService {
       return this.errorResponse(error);
     }
   }
-  async getDocumentPejabat(data: any) {
-    const documentPath = `assets/document/${data.document}`;
-
-    console.log(documentPath);
-
-    let document: any;
-    if (!fs.existsSync(documentPath)) {
-      // ambil badge optional dari api-dev
-
-      const response = await axios.get(
-        `https://api.dev.layanan.go.id/pse-api/storage/${data.id}/${data.document}`,
-        {
-          responseType: 'arraybuffer',
-        },
-      );
-      document = response.data || null;
-    } else {
-      document = fs.readFileSync(documentPath);
-    }
-    return { name: data.document, value: document };
-  }
 }
