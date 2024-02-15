@@ -149,6 +149,11 @@ export class UsersService {
         satuan_kerja: dataUser.satuan_kerja,
         alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
         kota: dataUser.kota,
+        dokumen: dataUser.dokumen,
+        url:
+          process.env.APP_DOMAIN +
+          `/api/storage/dokumen_pejabat/` +
+          dataUser.dokumen,
         propinsi: dataUser.propinsi,
         roles: [dataUser.account_role.role.name],
         permissions: permissionsData,
