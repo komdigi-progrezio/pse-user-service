@@ -150,7 +150,7 @@ export class UsersService {
         alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
         kota: dataUser.kota,
         dokumen: dataUser.dokumen,
-        url:
+        url_dokumen:
           process.env.APP_DOMAIN +
           `/api/storage/dokumen_pejabat/` +
           dataUser.dokumen,
