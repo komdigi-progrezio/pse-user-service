@@ -150,6 +150,11 @@ export class UsersService {
         satuan_kerja: dataUser.satuan_kerja,
         alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
         kota: dataUser.kota,
+        dokumen: dataUser.dokumen,
+        url_dokumen:
+          process.env.APP_DOMAIN +
+          `/api/storage/dokumen_pejabat/` +
+          dataUser.dokumen,
         propinsi: dataUser.propinsi,
         roles: [dataUser.account_role.role.name],
         permissions: permissionsData,
@@ -1056,26 +1061,5 @@ export class UsersService {
     } catch (error) {
       return this.errorResponse(error);
     }
-  }
-  async getDocumentPejabat(data: any) {
-    const documentPath = `assets/document/${data.document}`;
-
-    console.log(documentPath);
-
-    let document: any;
-    if (!fs.existsSync(documentPath)) {
-      // ambil badge optional dari api-dev
-
-      const response = await axios.get(
-        `https://api.dev.layanan.go.id/pse-api/storage/${data.id}/${data.document}`,
-        {
-          responseType: 'arraybuffer',
-        },
-      );
-      document = response.data || null;
-    } else {
-      document = fs.readFileSync(documentPath);
-    }
-    return { name: data.document, value: document };
   }
 }
