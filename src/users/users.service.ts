@@ -1061,4 +1061,168 @@ export class UsersService {
       return this.errorResponse(error);
     }
   }
+
+  async storePejabatPublic(request: any) {
+    try {
+      delete request.name;
+      delete request.file;
+
+      // TODO: uncomment this before release production
+      // const domainRegex = /\.(go\.id|desa\.id|id)$/i;
+
+      // // Melakukan pencocokan ekspresi reguler pada email
+      // const hasDesiredExtension = domainRegex.test(request.username);
+      // console.log(request.username);
+      // console.log('Pass =>   ', hasDesiredExtension);
+
+      // if (!hasDesiredExtension) {
+      //   return {
+      //     status: 500,
+      //     message:
+      //       'Email Harus Mengguakan ekstensi domain : go.id, desa.id, atau .id ',
+      //   };
+      // }
+
+      const dataAgency = await par_instansi.findByPk(request.instansi_induk);
+
+      if (dataAgency) {
+        const checkData = await account.findOne({
+          where: {
+            instansi_induk: request.instansi_induk,
+            status_register: request.status_register,
+          },
+        });
+        console.log('dataAgency Pass');
+        if (request.status_register == '1') {
+          console.log('register 1 pass');
+          if (!checkData) {
+            const statusApi = 'web';
+
+            const createUser = await account.create(request);
+            if (createUser) {
+              const pejabatId = await roles.findOne({
+                where: {
+                  name: 'Pejabat',
+                },
+              });
+              const addRoles = await account_roles.create({
+                role_id: pejabatId.id,
+                account_id: createUser.id.toString(),
+              });
+
+              if (addRoles) {
+                return {
+                  status: 200,
+                  message: 'Data Berhasil di Tambahkan',
+                  account_id: createUser.id,
+                };
+              }
+            }
+          }
+        } else {
+          console.log('Register 2 pass');
+          console.log(!checkData);
+
+          if (checkData) {
+            const statusApi = 'web';
+
+            const dataLastUser = await account.findOne({
+              where: {
+                instansi_induk: request.instansi_induk,
+                parent_id: null,
+              },
+            });
+
+            if (dataLastUser) {
+              const dataSubUser = await account.findAll({
+                where: {
+                  parent_id: dataLastUser.id,
+                },
+              });
+
+              // Tambahkan Pesan Error
+
+              // console.log('dataSubUser', dataSubUser);
+
+              // request.parent_id = dataLastUser.id;
+
+              const createUser = await account.create(request);
+
+              if (createUser) {
+                const pejabatId = await roles.findOne({
+                  where: {
+                    name: 'Pejabat',
+                  },
+                });
+                const addRoles = await account_roles.create({
+                  role_id: pejabatId.id,
+                  account_id: createUser.id.toString(),
+                });
+
+                if (dataSubUser) {
+                  await account.update(
+                    {
+                      parent_id: createUser.id,
+                    },
+                    {
+                      where: {
+                        parent_id: dataLastUser.id,
+                      },
+                    },
+                  );
+                }
+
+                if (addRoles) {
+                  return {
+                    status: 200,
+                    message: 'Data Berhasil di Tambahkan',
+                    account_id: createUser.id,
+                  };
+                }
+              }
+            } else {
+              return {
+                status: 500,
+                message:
+                  'Belum Ada Pejabat Baru Terdaftar Di Instansi Yang Di pilih',
+              };
+            }
+          }
+        }
+      }
+      return {
+        status: 500,
+        message:
+          'Satu Instansi Tidak Boleh Lebih Dari Satu Akun / Instansi Tersebut Sudah Memiliki Akun Baru dan Akun Pengganti',
+      };
+    } catch (error) {
+      return this.errorResponse(error);
+    }
+  }
+
+  async getDocumentPejabat(data: any) {
+    try {
+      const documentPath = `assets/document/${data.document}`;
+
+      console.log(documentPath);
+
+      let document: any;
+      if (!fs.existsSync(documentPath)) {
+        // ambil badge optional dari api-dev
+
+        const response = await axios.get(
+          `https://api.dev.layanan.go.id/pse-api/storage/${data.id}/${data.document}`,
+          {
+            responseType: 'arraybuffer',
+          },
+        );
+        document = response.data || null;
+      } else {
+        document = fs.readFileSync(documentPath);
+      }
+      return { name: data.document, value: document };
+    } catch (error) {
+      return this.errorResponse(error);
+    }
+  }
 }

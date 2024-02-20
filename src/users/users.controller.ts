@@ -159,4 +159,35 @@ export class UsersController {
   dropdown(@Payload() request: any) {
     return this.usersService.dropdown(request);
   }
+
+  @MessagePattern('storePejabatPublic')
+  storePejabatPublic(@Payload() data: any) {
+    const file = data.file;
+
+    console.log(file);
+
+    const buffer = Buffer.from(file.buffer.data);
+
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+
+    for (let i = 0; i < 9; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
+    }
+
+    const nama_document = `dokumen_pejabat_${result}.pdf`;
+
+    // Tulis buffer ke dalam file
+    fs.writeFile(`assets/document/${nama_document}`, buffer);
+
+    data.dokumen = nama_document;
+
+    return this.usersService.storePejabatPublic(data);
+  }
+
+  @MessagePattern('getDocumentPejabat')
+  getDocumentPejabat(@Payload() data: string) {
+    return this.usersService.getDocumentPejabat(data);
+  }
 }
