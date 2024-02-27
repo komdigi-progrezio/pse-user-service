@@ -1124,7 +1124,15 @@ export class UsersService {
           console.log('Register 2 pass');
           console.log(!checkData);
 
-          if (checkData) {
+          const checkDataPengganti = await account.findOne({
+            where: {
+              instansi_induk: request.instansi_induk,
+              status: 1,
+            },
+          });
+
+
+          if (checkDataPengganti) {
             const statusApi = 'web';
 
             const dataLastUser = await account.findOne({
