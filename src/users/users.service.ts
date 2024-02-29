@@ -1179,7 +1179,36 @@ export class UsersService {
                       },
                     },
                   );
+                  
                 }
+
+                //Update Sistem Elektronik
+                await sis_profil.update(
+                  {
+                    account_id: createUser.id,
+                  },
+                  {
+                    where: {
+                      account_id: dataLastUser.id,
+                    },
+                  },
+                );
+                
+
+                //Update Old Pejabat
+                await account.update(
+                  {
+                    instansi_induk: null,
+                    instansi_induk_text:null
+                  },
+                  {
+                    where: {
+                      id: dataLastUser.id,
+                    },
+                  },
+                );
+
+
 
                 if (addRoles) {
                   return {
