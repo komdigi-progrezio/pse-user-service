@@ -133,6 +133,22 @@ export class UsersService {
 
     // return permissionsData;
 
+    let url_dokumen_pejabat = process.env.APP_DOMAIN + `/api/storage/dokumen_pejabat/` + dataUser.dokumen;
+    const image_exist = async(image_url) =>{
+      let result = true;
+      const response = await axios.get(
+        image_url
+      ).catch(function (error) {
+        result = false;
+      });
+
+      return result;
+    }
+    const check_image = await image_exist(url_dokumen_pejabat);
+    if(!check_image){
+      url_dokumen_pejabat = process.env.OLD_APP_DOMAIN + `/storage/dokumen_pejabat/` + dataUser.id + "/" + dataUser.dokumen;
+    }
+
     return {
       data: {
         id: dataUser.id,
@@ -151,10 +167,7 @@ export class UsersService {
         alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
         kota: dataUser.kota,
         dokumen: dataUser.dokumen,
-        url_dokumen:
-          process.env.APP_DOMAIN +
-          `/api/storage/dokumen_pejabat/` +
-          dataUser.dokumen,
+        url_dokumen:url_dokumen_pejabat,
         propinsi: dataUser.propinsi,
         roles: [dataUser.account_role.role.name],
         permissions: permissionsData,
@@ -784,6 +797,22 @@ export class UsersService {
 
     data.satuan_kerja = data.satuan_kerja ? data.satuan_kerja : 'Kosong';
 
+    let url_dokumen_pejabat = process.env.APP_DOMAIN + '/api/storage/dokumen_pejabat/' + data.dokumen;
+    const image_exist = async(image_url) =>{
+      let result = true;
+      const response = await axios.get(
+        image_url
+      ).catch(function (error) {
+        result = false;
+      });
+
+      return result;
+    }
+    const check_image = await image_exist(url_dokumen_pejabat);
+    if(!check_image){
+      url_dokumen_pejabat = process.env.OLD_APP_DOMAIN + '/storage/dokumen_pejabat/' + data.id + "/" + data.dokumen;
+    }
+
     const formattedData = {
       id: data.id,
       username: data.username,
@@ -801,8 +830,7 @@ export class UsersService {
       kode_pos: data.kode_pos,
       instansi_induk: data.instansi_induk,
       dokumen: data.dokumen,
-      url_dokumen:
-        process.env.APP_DOMAIN + '/api/storage/dokumen_pejabat/' + data.dokumen,
+      url_dokumen:url_dokumen_pejabat,
       created_at: formattedDate(data.created_at),
       modified_at: formattedDate(data.modified_at),
       status: data.status ? data.status : 0,
