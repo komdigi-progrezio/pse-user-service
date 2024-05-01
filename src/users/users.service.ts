@@ -23,6 +23,11 @@ import { createSuccessResponse } from 'src/utils/createSuccessResponse';
 
 import * as fs from 'fs';
 const axios = require('axios');
+const https = require('https');
+
+const agent = new https.Agent({
+  rejectUnauthorized: false // This option ignores SSL certificates
+});
 
 @Injectable()
 export class UsersService {
@@ -1249,11 +1254,12 @@ export class UsersService {
       let document: any;
       if (!fs.existsSync(documentPath)) {
         // ambil badge optional dari api-dev
-
+        console.log(`${process.env.OLD_APP_DOMAIN}/storage/dokumen_pejabat/${data.id}/${data.document}`);
         const response = await axios.get(
-          `https://api.dev.layanan.go.id/pse-api/storage/${data.id}/${data.document}`,
+          `${process.env.OLD_APP_DOMAIN}/storage/dokumen_pejabat/${data.id}/${data.document}`,
           {
             responseType: 'arraybuffer',
+            httpsAgent: agent
           },
         );
         document = response.data || null;
