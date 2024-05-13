@@ -1247,22 +1247,27 @@ export class UsersService {
 
   async getDocumentPejabat(data: any) {
     try {
-      const documentPath = `assets/document/${data.document}`;
-
+      let documentPath = `assets/document/${data.document}`;
       console.log(documentPath);
 
       let document: any;
       if (!fs.existsSync(documentPath)) {
-        // ambil badge optional dari api-dev
-        console.log(`${process.env.OLD_APP_DOMAIN}/storage/dokumen_pejabat/${data.id}/${data.document}`);
-        const response = await axios.get(
-          `${process.env.OLD_APP_DOMAIN}/storage/dokumen_pejabat/${data.id}/${data.document}`,
-          {
-            responseType: 'arraybuffer',
-            httpsAgent: agent
-          },
-        );
-        document = response.data || null;
+        documentPath = `assets/dokumen_pejabat/${data.id}/${data.document}`;
+        console.log(documentPath);
+        if (!fs.existsSync(documentPath)) {
+          // ambil badge optional dari api-dev
+          console.log(`${process.env.OLD_APP_DOMAIN}/storage/dokumen_pejabat/${data.id}/${data.document}`);
+          const response = await axios.get(
+            `${process.env.OLD_APP_DOMAIN}/storage/dokumen_pejabat/${data.id}/${data.document}`,
+            {
+              responseType: 'arraybuffer',
+              httpsAgent: agent
+            },
+          );
+          document = response.data || null;
+        } else {
+          document = fs.readFileSync(documentPath);
+        }
       } else {
         document = fs.readFileSync(documentPath);
       }
