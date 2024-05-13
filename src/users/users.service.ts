@@ -139,20 +139,20 @@ export class UsersService {
     // return permissionsData;
 
     let url_dokumen_pejabat = process.env.APP_DOMAIN + `/api/storage/dokumen_pejabat/` + dataUser.dokumen;
-    const image_exist = async(image_url) =>{
-      let result = true;
-      const response = await axios.get(
-        image_url
-      ).catch(function (error) {
-        result = false;
-      });
+    // const image_exist = async(image_url) =>{
+    //   let result = true;
+    //   const response = await axios.get(
+    //     image_url
+    //   ).catch(function (error) {
+    //     result = false;
+    //   });
 
-      return result;
-    }
-    const check_image = await image_exist(url_dokumen_pejabat);
-    if(!check_image){
-      url_dokumen_pejabat = process.env.OLD_APP_DOMAIN + `/storage/dokumen_pejabat/` + dataUser.id + "/" + dataUser.dokumen;
-    }
+    //   return result;
+    // }
+    // const check_image = await image_exist(url_dokumen_pejabat);
+    // if(!check_image){
+    //   url_dokumen_pejabat = process.env.OLD_APP_DOMAIN + `/storage/dokumen_pejabat/` + dataUser.id + "/" + dataUser.dokumen;
+    // }
 
     return {
       data: {
@@ -803,20 +803,20 @@ export class UsersService {
     data.satuan_kerja = data.satuan_kerja ? data.satuan_kerja : 'Kosong';
 
     let url_dokumen_pejabat = process.env.APP_DOMAIN + '/api/storage/dokumen_pejabat/' + data.dokumen;
-    const image_exist = async(image_url) =>{
-      let result = true;
-      const response = await axios.get(
-        image_url
-      ).catch(function (error) {
-        result = false;
-      });
+    // const image_exist = async(image_url) =>{
+    //   let result = true;
+    //   const response = await axios.get(
+    //     image_url
+    //   ).catch(function (error) {
+    //     result = false;
+    //   });
 
-      return result;
-    }
-    const check_image = await image_exist(url_dokumen_pejabat);
-    if(!check_image){
-      url_dokumen_pejabat = process.env.OLD_APP_DOMAIN + '/storage/dokumen_pejabat/' + data.id + "/" + data.dokumen;
-    }
+    //   return result;
+    // }
+    // const check_image = await image_exist(url_dokumen_pejabat);
+    // if(!check_image){
+    //   url_dokumen_pejabat = process.env.OLD_APP_DOMAIN + '/storage/dokumen_pejabat/' + data.id + "/" + data.dokumen;
+    // }
 
     const formattedData = {
       id: data.id,
