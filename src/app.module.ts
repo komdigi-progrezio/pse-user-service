@@ -28,6 +28,7 @@ import { PermissionsModule } from './permissions/permissions.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
+      logging: false,
       models: [],
       autoLoadModels: true,
       synchronize: true,
