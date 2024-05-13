@@ -138,7 +138,7 @@ export class UsersService {
 
     // return permissionsData;
 
-    let url_dokumen_pejabat = process.env.APP_DOMAIN + `/api/storage/dokumen_pejabat/` + dataUser.dokumen;
+    let url_dokumen_pejabat = `${process.env.APP_DOMAIN}/api/storage/dokumen_pejabat/${dataUser.id}/${dataUser.dokumen}`;
     // const image_exist = async(image_url) =>{
     //   let result = true;
     //   const response = await axios.get(
@@ -789,7 +789,7 @@ export class UsersService {
 
     let alamatInstansi: par_instansi;
 
-    if (data.alamat) {
+    if (data?.alamat) {
     } else {
       alamatInstansi = await par_instansi.findByPk(data.instansi_induk);
       data.alamat = alamatInstansi ? alamatInstansi.alamat : 'Kosong';
@@ -802,7 +802,7 @@ export class UsersService {
 
     data.satuan_kerja = data.satuan_kerja ? data.satuan_kerja : 'Kosong';
 
-    let url_dokumen_pejabat = process.env.APP_DOMAIN + '/api/storage/dokumen_pejabat/' + data.dokumen;
+    let url_dokumen_pejabat = `${process.env.APP_DOMAIN}/api/storage/dokumen_pejabat/${data.id}/${data.dokumen}`;
     // const image_exist = async(image_url) =>{
     //   let result = true;
     //   const response = await axios.get(
