@@ -37,6 +37,13 @@ export class UsersService {
     // 'dokumen' => $this->dokumen,
     // 'url_dokumen' => url('/') . '/storage/dokumen_pejabat/' . $this->id . '/' . $this->dokumen,
     // 'last_login' => $this->last_login,
+    const dateIn = new Date();
+    const updateLogin = await account.update(
+      {
+        last_login: formattedDate(dateIn),
+      },
+      { where: { username: authUserDto } },
+    );
 
     const dataUser = await account.findOne({
       where: { username: authUserDto },
@@ -98,6 +105,23 @@ export class UsersService {
         permissions: permissionsData,
       },
     };
+  }
+
+  async logout(outUserDto: any) {
+    const dateOut = new Date();
+    const updateLogout = await account.update(
+      {
+        last_logout: formattedDate(dateOut),
+      },
+      { where: { username: outUserDto } },
+    );
+
+    if(updateLogout){
+      return {
+        status: 200,
+        message: 'Sukses Logout',
+      };  
+    }
   }
 
   async getProfil(account_id: any) {
@@ -846,7 +870,7 @@ export class UsersService {
       nama_instansi: data.instansi_induk_text,
       is_admin: null,
       parent_id: null,
-      last_logout: null,
+      last_logout: data.last_logout,
       status_register: 2,
       replace_by_account_id: null,
       user_report: null,
