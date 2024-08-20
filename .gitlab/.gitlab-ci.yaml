@@ -9,6 +9,7 @@ variables:
   DOCKER_REGCRED: "nexus-regcred"
   CI_IMAGE_NAME: "${REGISTRY}/${GROUP_NAME}/${APP_NAME}"
   APP_NAME: ${CI_PROJECT_NAME}
+  APP_ENV: "dev"
   GROUP_NAME: "pse-om2024"
   APP_NAMESPACE: "pse-om2024"
   APP_PORT: 8001
@@ -32,8 +33,8 @@ publish:
   before_script:
     - mkdir -p .docker/ && cat $DOCKER_CONF_JSON > .docker/config.json
   script:
-    - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_IID} .
-    - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_IID}
+    - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID} .
+    - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID}
   only:
     - pse-om2024/prod
 
