@@ -1160,16 +1160,20 @@ export class UsersService {
 
             const createUser = await account.create(request);
             if (createUser) {
+              console.log('find roles');
               const pejabatId = await roles.findOne({
                 where: {
                   name: 'Pejabat',
                 },
               });
+              console.log('end roles');
+              console.log('add account roles');
               const addRoles = await account_roles.create({
                 role_id: pejabatId.id,
                 account_id: createUser.id.toString(),
               });
-
+              console.log('end account roles');
+              console.log(createUser.id.toString());
               if (addRoles) {
                 return {
                   status: 200,
@@ -1189,7 +1193,7 @@ export class UsersService {
               status: 1,
             },
           });
-
+          console.log('Check data Penganti');
 
           if (checkDataPengganti) {
             const statusApi = 'web';
@@ -1200,33 +1204,38 @@ export class UsersService {
                 parent_id: null,
               },
             });
-
+            console.log('Akhir data Penganti');
+            console.log('Check data Last User');
             if (dataLastUser) {
               const dataSubUser = await account.findAll({
                 where: {
                   parent_id: dataLastUser.id,
                 },
               });
-
+              
+              console.log('Find data last user');
               // Tambahkan Pesan Error
 
               // console.log('dataSubUser', dataSubUser);
 
               // request.parent_id = dataLastUser.id;
 
+              console.log('create user');
               const createUser = await account.create(request);
-
+              console.log('akhir create user');
               if (createUser) {
+                console.log('Find role');
                 const pejabatId = await roles.findOne({
                   where: {
                     name: 'Pejabat',
                   },
                 });
+                console.log('End Role');
                 const addRoles = await account_roles.create({
                   role_id: pejabatId.id,
                   account_id: createUser.id.toString(),
                 });
-
+                console.log('Find data sub');
                 if (dataSubUser) {
                   await account.update(
                     {
@@ -1240,7 +1249,8 @@ export class UsersService {
                   );
                   
                 }
-
+                console.log('End data sub');
+                console.log('start add roles');
                 if (addRoles) {
                   return {
                     status: 200,
@@ -1248,6 +1258,7 @@ export class UsersService {
                     account_id: createUser.id,
                   };
                 }
+                console.log('End add roles');
               }
             } else {
               return {
