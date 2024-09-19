@@ -471,10 +471,14 @@ export class UsersService {
     try {
       let query = {
         status: request.status === 'enable' ? 1 : 0,
+        alasan: request.alasan,
       };
       if (request.status === 'enable') {
         query['keycloak_id'] = request.keycloakId;
         query['is_has_keycloak'] = true;
+      }
+      if (request.status === 'disable') {
+        query['alasan'] = request.alasan;
       }
       const result = await account.update(query, {
         where: {
@@ -880,6 +884,7 @@ export class UsersService {
       gitlab_user_id: null,
       keycloak_id: null,
       is_has_keycloak: null,
+      alasan: data.alasan,
     };
 
     return {
