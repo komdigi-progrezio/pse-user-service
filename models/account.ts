@@ -46,6 +46,7 @@ export interface accountAttributes {
   keycloak_id?: string;
   is_has_keycloak?: boolean;
   is_notify?: boolean;
+  alasan?: string;
 }
 
 @Table({ tableName: 'account', schema: 'public', timestamps: true, createdAt: 'created_at', updatedAt: 'modified_at' })
@@ -171,4 +172,7 @@ export class account
 
   @Column({ allowNull: true, type: DataType.BOOLEAN })
   is_notify?: boolean;
+
+  @Column({ allowNull: true, type: DataType.STRING(255) })
+  alasan?: string;
 }
