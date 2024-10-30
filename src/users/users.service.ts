@@ -821,9 +821,9 @@ export class UsersService {
     } else {
       alamatInstansi = await par_instansi.findByPk(data.instansi_induk);
       data.alamat = alamatInstansi ? alamatInstansi.alamat : 'Kosong';
-      const kotaInstansi = await par_kota.findByPk(parseInt(data.kota));
+      const kotaInstansi = await par_kota.findByPk(data.kota);
       data.kota = kotaInstansi ? kotaInstansi.nama : 'Kosong';
-      const propinsiInstansi = await par_propinsi.findByPk(parseInt(data.propinsi));
+      const propinsiInstansi = await par_propinsi.findByPk(data.propinsi);
       data.propinsi = propinsiInstansi ? propinsiInstansi.nama : 'Kosong';
       data.kode_pos = alamatInstansi ? alamatInstansi.kode_pos : 'Kosong';
     }
