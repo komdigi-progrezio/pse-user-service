@@ -379,7 +379,7 @@ export class UsersService {
   }
 
   async findAll(request: any, account_id: number) {
-    console.log(account_id);
+    // console.log(account_id);
     const pageSize = 10; // Jumlah item per halaman
     const page: number = +request.page || 1; // Mendapatkan nomor halaman dari permintaan atau default ke halaman 1
 
@@ -713,6 +713,7 @@ export class UsersService {
         created_at: this.formatISOStringToDMYHI(item.created_at),
         modified_at: this.formatISOStringToDMYHI(item.modified_at),
         is_notify: item.is_notify ? 'Ya' : 'Tidak',
+        alasan: item.alasan ? item.alasan : "",
       };
     });
 

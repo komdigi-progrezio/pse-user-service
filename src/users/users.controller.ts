@@ -170,7 +170,7 @@ export class UsersController {
 
     console.log(file);
 
-    const buffer = Buffer.from(file.buffer.data);
+    const buffer = file?.buffer?.data ? Buffer.from(file.buffer.data) : Buffer.from('default');
 
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
