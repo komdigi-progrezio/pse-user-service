@@ -164,6 +164,11 @@ export class UsersController {
     return this.usersService.dropdown(request);
   }
 
+  @MessagePattern('getUserByUsername')
+  getUserByUsername(@Payload() request: any) {
+    return this.usersService.getUserByUsername(request);
+  }
+
   @MessagePattern('storePejabatPublic')
   storePejabatPublic(@Payload() data: any) {
     const file = data.file;

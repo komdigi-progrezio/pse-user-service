@@ -1317,4 +1317,26 @@ export class UsersService {
       return this.errorResponse(error);
     }
   }
+
+  async getUserByUsername(request: any){
+    const checkUserData = await account.findOne({
+      where: {
+        username: request.username,
+      },
+    })
+
+    try {
+      if (checkUserData) {
+        const randomCode = Math.floor(100000 + Math.random() * 900000);
+        console.log(`Kode otp yang dihasilkan: ${randomCode}`);
+        return {
+          user: checkUserData,
+          message: "User ditemukan",
+          otpCode: randomCode,
+        };
+      };
+    } catch (error) {
+      return this.errorResponse(error);
+    }
+  }
 }
