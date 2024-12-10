@@ -103,6 +103,8 @@ export class UsersService {
         propinsi: dataUser.propinsi,
         roles: [dataUser.account_role.role.name],
         permissions: permissionsData,
+        kode_pos: dataUser.kode_pos,
+        created_at: dataUser.created_at,
       },
     };
   }
