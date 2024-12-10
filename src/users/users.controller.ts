@@ -199,4 +199,9 @@ export class UsersController {
   getDocumentPejabat(@Payload() data: string) {
     return this.usersService.getDocumentPejabat(data);
   }
+
+  @MessagePattern('createLogin')
+  createLogin(@Payload() request: any) {
+    return this.usersService.createLogin(request);
+  }
 }

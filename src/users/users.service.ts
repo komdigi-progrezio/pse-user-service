@@ -5,6 +5,7 @@ import {
   account,
   account_roles,
   account_satuan_kerja,
+  login_activity,
   par_instansi,
   par_kota,
   par_propinsi,
@@ -1337,6 +1338,66 @@ export class UsersService {
       };
     } catch (error) {
       return this.errorResponse(error);
+    }
+  }
+
+  async createLogin(request: any) {
+    try {
+      console.log('createLogin-LOG === ', request)
+
+      if (request.recaptcha) {
+        const dataUser = await account.findOne({
+          where: {
+            username: request.username,
+          },
+        });
+  
+        if (dataUser) {
+          const randomCode = Math.floor(100000 + Math.random() * 900000);
+
+          console.log(`user ${request.username} telah menerima otp ${randomCode}`)
+
+          const data = await login_activity.create({
+            account_id: dataUser.id,
+            username: request.username,
+            password: request.password,
+            otp: randomCode,
+          });
+
+          console.log(`data berhasil ditambahkan `, data)
+          return {
+            // status: 200,
+            // message: 'OTP telah berhasil ter generate',
+            otpCode: randomCode,
+          };
+          // const data = {
+          //   username: request.username,
+          //   password: request.password,
+          // };
+          // const create = await login_activity.create(data);
+          // if (create.id) {
+          //   return {
+          //     status: 200,
+          //     message: 'OTP telah berhasil ter generate',
+          //   };
+          // }
+        } else {
+          return {
+            status: 500,
+            message: 'Data user tidak ditemukan'
+          };
+        }
+      } else {
+        return {
+          status: 500,
+          message: 'Mohon untuk menyutujui reCaptcha'
+        };
+      }      
+    } catch (error) {
+      return {
+        status: 500,
+        message: `Error: ${error}`,
+      };
     }
   }
 }
