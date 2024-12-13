@@ -204,4 +204,9 @@ export class UsersController {
   createLogin(@Payload() request: any) {
     return this.usersService.createLogin(request);
   }
+
+  @MessagePattern('verifyOtp')
+  verifyOtp(@Payload() request: any) {
+    return this.usersService.verifyOtp(request);
+  }
 }

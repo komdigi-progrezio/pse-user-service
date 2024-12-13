@@ -1402,4 +1402,54 @@ export class UsersService {
       };
     }
   }
+
+  async verifyOtp(request: any) {
+    try {
+      console.log('Start to verify otp => ', request);
+
+      if (request.otp) {
+        const dataLogUser = await login_activity.findOne({
+          where: {
+            otp: request.otp,
+          },
+        });
+
+        if (dataLogUser) {
+          
+          const createdAtUser = dataLogUser.created_at;
+          const now = new Date();
+          const differenceInMinutes = (now.getTime() - createdAtUser.getTime()) / (1000 * 60);
+
+          if (differenceInMinutes <= 5) {
+            return {
+              status: 200,
+              message: 'Login berhasil',
+            };
+          } else {
+            return {
+              status: 400,
+              message: 'OTP sudah kedaluwarsa',
+            };
+          }
+        } else {
+          return {
+            status: 404,
+            message: 'OTP tidak ditemukan',
+          };
+        }
+      } else {
+        return {
+          status: 400,
+          message: 'OTP tidak disertakan dalam permintaan',
+        };
+      }
+    } catch (error) {
+      console.error('Error while verifying OTP:', error);
+      return {
+        status: 500,
+        message: 'Terjadi kesalahan pada server',
+      };
+    }
+  }
+
 }
