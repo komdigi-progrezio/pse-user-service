@@ -106,6 +106,7 @@ export class UsersService {
         permissions: permissionsData,
         kode_pos: dataUser.kode_pos,
         created_at: dataUser.created_at,
+        modified_at: dataUser.modified_at,
       },
     };
   }
