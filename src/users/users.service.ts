@@ -107,6 +107,7 @@ export class UsersService {
         kode_pos: dataUser.kode_pos,
         created_at: dataUser.created_at,
         modified_at: dataUser.modified_at,
+        dokumen: dataUser.dokumen,
       },
     };
   }
@@ -1042,6 +1043,8 @@ export class UsersService {
   async updateProfile(id: number, request: any) {
     try {
       delete request._method;
+      request.nama_status = request.nama_status == 'Aktif' ? 1 : 0;
+      request.status_register = request.status_register == 'Pejabat' ? 1 : 0;
 
       const create = await account.update(request, {
         where: {
