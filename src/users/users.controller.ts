@@ -164,6 +164,11 @@ export class UsersController {
     return this.usersService.dropdown(request);
   }
 
+  @MessagePattern('getUserByUsername')
+  getUserByUsername(@Payload() request: any) {
+    return this.usersService.getUserByUsername(request);
+  }
+
   @MessagePattern('storePejabatPublic')
   storePejabatPublic(@Payload() data: any) {
     const file = data.file;
@@ -193,5 +198,15 @@ export class UsersController {
   @MessagePattern('getDocumentPejabat')
   getDocumentPejabat(@Payload() data: string) {
     return this.usersService.getDocumentPejabat(data);
+  }
+
+  @MessagePattern('createLogin')
+  createLogin(@Payload() request: any) {
+    return this.usersService.createLogin(request);
+  }
+
+  @MessagePattern('verifyOtp')
+  verifyOtp(@Payload() request: any) {
+    return this.usersService.verifyOtp(request);
   }
 }

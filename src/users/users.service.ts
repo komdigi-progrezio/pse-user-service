@@ -5,6 +5,7 @@ import {
   account,
   account_roles,
   account_satuan_kerja,
+  login_activity,
   par_instansi,
   par_kota,
   par_propinsi,
@@ -105,6 +106,8 @@ export class UsersService {
         permissions: permissionsData,
         kode_pos: dataUser.kode_pos,
         created_at: dataUser.created_at,
+        modified_at: dataUser.modified_at,
+        dokumen: dataUser.dokumen,
       },
     };
   }
@@ -1040,6 +1043,8 @@ export class UsersService {
   async updateProfile(id: number, request: any) {
     try {
       delete request._method;
+      request.nama_status = request.nama_status == 'Aktif' ? 1 : 0;
+      request.status_register = request.status_register == 'Pejabat' ? 1 : 0;
 
       const create = await account.update(request, {
         where: {
@@ -1319,4 +1324,136 @@ export class UsersService {
       return this.errorResponse(error);
     }
   }
+
+  async getUserByUsername(request: any){
+    const checkUserData = await account.findOne({
+      where: {
+        username: request.username,
+      },
+    })
+
+    try {
+      if (checkUserData) {
+        const randomCode = Math.floor(100000 + Math.random() * 900000);
+        console.log(`Kode otp yang dihasilkan: ${randomCode}`);
+        return {
+          user: checkUserData,
+          message: "User ditemukan",
+          otpCode: randomCode,
+        };
+      };
+    } catch (error) {
+      return this.errorResponse(error);
+    }
+  }
+
+  async createLogin(request: any) {
+    try {
+      console.log('createLogin-LOG === ', request)
+
+      if (request.recaptcha) {
+        const dataUser = await account.findOne({
+          where: {
+            username: request.username,
+          },
+        });
+  
+        if (dataUser) {
+          const randomCode = Math.floor(100000 + Math.random() * 900000);
+
+          console.log(`user ${request.username} telah menerima otp ${randomCode}`)
+
+          const data = await login_activity.create({
+            account_id: dataUser.id,
+            username: request.username,
+            password: request.password,
+            otp: randomCode,
+          });
+
+          console.log(`data berhasil ditambahkan `, data)
+          return {
+            // status: 200,
+            // message: 'OTP telah berhasil ter generate',
+            otpCode: randomCode,
+          };
+          // const data = {
+          //   username: request.username,
+          //   password: request.password,
+          // };
+          // const create = await login_activity.create(data);
+          // if (create.id) {
+          //   return {
+          //     status: 200,
+          //     message: 'OTP telah berhasil ter generate',
+          //   };
+          // }
+        } else {
+          return {
+            status: 500,
+            message: 'Data user tidak ditemukan'
+          };
+        }
+      } else {
+        return {
+          status: 500,
+          message: 'Mohon untuk menyutujui reCaptcha'
+        };
+      }      
+    } catch (error) {
+      return {
+        status: 500,
+        message: `Error: ${error}`,
+      };
+    }
+  }
+
+  async verifyOtp(request: any) {
+    try {
+      console.log('Start to verify otp => ', request);
+
+      if (request.otp) {
+        const dataLogUser = await login_activity.findOne({
+          where: {
+            otp: request.otp,
+          },
+        });
+
+        if (dataLogUser) {
+          
+          const createdAtUser = dataLogUser.created_at;
+          const now = new Date();
+          const differenceInMinutes = (now.getTime() - createdAtUser.getTime()) / (1000 * 60);
+
+          if (differenceInMinutes <= 5) {
+            return {
+              status: 200,
+              message: 'Login berhasil',
+            };
+          } else {
+            return {
+              status: 400,
+              message: 'OTP sudah kedaluwarsa',
+            };
+          }
+        } else {
+          return {
+            status: 404,
+            message: 'OTP tidak ditemukan',
+          };
+        }
+      } else {
+        return {
+          status: 400,
+          message: 'OTP tidak disertakan dalam permintaan',
+        };
+      }
+    } catch (error) {
+      console.error('Error while verifying OTP:', error);
+      return {
+        status: 500,
+        message: 'Terjadi kesalahan pada server',
+      };
+    }
+  }
+
 }
