@@ -7,7 +7,8 @@ import { request } from 'http';
 import * as fs from 'fs/promises'; // Modul fs dari Node.js versi 14 ke atas
 import { errorResponse } from 'src/utils/errorResponse';
 
-@Controller()
+
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -209,4 +210,15 @@ export class UsersController {
   verifyOtp(@Payload() request: any) {
     return this.usersService.verifyOtp(request);
   }
+
+  @MessagePattern('login-local')
+  async loginLocal(@Payload() payload: { username: string; password: string }) {
+    return this.usersService.loginLocal(payload.username, payload.password);
+  }
+
+  @MessagePattern('create-password')
+  async createPassword(@Payload() payload: { token: string; password: string }) {
+    return this.usersService.createPassword(payload.token, payload.password);
+  }
+
 }

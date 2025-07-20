@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
@@ -21,6 +22,8 @@ import { Op } from 'sequelize';
 import { validate } from 'class-validator';
 import { formattedDate } from 'src/utils/formattedDate';
 import { createSuccessResponse } from 'src/utils/createSuccessResponse';
+import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
 
 import * as fs from 'fs';
 const axios = require('axios');
@@ -32,6 +35,9 @@ const agent = new https.Agent({
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @Inject('PSE_NOTIFICATION_SERVICE') private readonly clientNotification: ClientProxy,
+  ) {}
   async auth(authUserDto: any) {
     // 'kode_pos' => $this->parInstansi === null ? 'Kosong' : $this->parInstansi->kode_pos,
     // 'instansi_induk' => $this->instansi_induk,
@@ -112,6 +118,100 @@ export class UsersService {
     };
   }
 
+  async loginLocal(username: string, password: string) {
+    console.log('LOGIN-LOCAL DEBUG >>>', { username, password });
+    try {
+      const user = await account.findOne({ where: { username } });
+
+      if (!user) {
+        return { status: 404, message: 'Akun tidak ditemukan' };
+      }
+
+      if (!user.password) {
+        // No password set, send email to initiate password creation
+        const token = jwt.sign(
+          { email: user.username },
+          process.env.SECRET_KEY || 'secret',
+          { expiresIn: '10m' },
+        );
+
+        const link = `${process.env.APP_DOMAIN}/create-password?token=${token}`;
+
+        this.clientNotification.emit('sendCreatePasswordEmail', {
+          email: user.username,
+          link,
+        });
+
+        return {
+          status: 403,
+          message: 'Silakan cek email Anda untuk membuat password baru terlebih dahulu.',
+          action: 'create-password',
+        };
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return { status: 401, message: 'Password salah' };
+      }
+
+      // ✅ SUCCESSFUL LOGIN — generate JWT
+      const loginTime = new Date();
+      await account.update({ last_login: loginTime }, { where: { id: user.id } });
+
+      const payload = {
+        id: user.id,
+        email: user.email,
+        nama: user.nama,
+      };
+
+      const token = jwt.sign(payload, process.env.SECRET_KEY || 'secret', {
+        expiresIn: '1d',
+      });
+
+      return {
+        status: 200,
+        message: 'Login berhasil',
+        data: {
+          id: user.id,
+          nama: user.nama,
+          username: user.email,
+          email: user.email,
+          token,
+        },
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        message: `Terjadi kesalahan: ${err.message}`,
+      };
+    }
+  }
+
+
+  async createPassword(token: string, newPassword: string) {
+    try {
+      const decoded: any = jwt.verify(token, process.env.SECRET_KEY || 'secret');
+
+      const user = await account.findOne({ where: { username: decoded.email } });
+
+      if (!user) {
+        return { status: 404, message: 'Akun tidak ditemukan' };
+      }
+
+      if (user.password) {
+        return { status: 400, message: 'Password sudah pernah dibuat' };
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await account.update({ password: hashedPassword }, { where: { id: user.id } });
+
+      return { status: 200, message: 'Password berhasil dibuat. Silakan login.' };
+    } catch (err) {
+      return { status: 403, message: 'Token tidak valid atau sudah kedaluwarsa' };
+    }
+  }
+
+
   async logout(outUserDto: any) {
     const dateOut = new Date();
     const updateLogout = await account.update(
@@ -152,36 +252,17 @@ export class UsersService {
       },
     });
 
-    // return dataUser;
+    const permissionsData: string[] = [];
 
-    const permissionsData = [];
+    const rolePermissions = dataUser.account_role?.role?.role_has_permissions || [];
 
-    for (
-      let i = 0;
-      i < dataUser.account_role.role.role_has_permissions.length;
-      i++
-    ) {
-      const element = dataUser.account_role.role.role_has_permissions[i];
-      permissionsData.push(element.permission.name);
+    for (const element of rolePermissions) {
+      if (element?.permission?.name) {
+        permissionsData.push(element.permission.name);
+      }
     }
 
-    // return permissionsData;
-
-    let url_dokumen_pejabat = `${process.env.APP_DOMAIN}/api/storage/dokumen_pejabat/${dataUser.id}/${dataUser.dokumen}`;
-    // const image_exist = async(image_url) =>{
-    //   let result = true;
-    //   const response = await axios.get(
-    //     image_url
-    //   ).catch(function (error) {
-    //     result = false;
-    //   });
-
-    //   return result;
-    // }
-    // const check_image = await image_exist(url_dokumen_pejabat);
-    // if(!check_image){
-    //   url_dokumen_pejabat = process.env.OLD_APP_DOMAIN + `/storage/dokumen_pejabat/` + dataUser.id + "/" + dataUser.dokumen;
-    // }
+    const url_dokumen_pejabat = `${process.env.APP_DOMAIN}/api/storage/dokumen_pejabat/${dataUser.id}/${dataUser.dokumen}`;
 
     return {
       data: {
@@ -198,16 +279,18 @@ export class UsersService {
         no_telepon: dataUser.no_telepon,
         no_hp: dataUser.no_hp,
         satuan_kerja: dataUser.satuan_kerja,
-        alamat: dataUser.alamat ? dataUser.alamat : 'Kosong',
+        alamat: dataUser.alamat || 'Kosong',
         kota: dataUser.kota,
         dokumen: dataUser.dokumen,
-        url_dokumen:url_dokumen_pejabat,
+        url_dokumen: url_dokumen_pejabat,
         propinsi: dataUser.propinsi,
-        roles: [dataUser.account_role.role.name],
+        roles: [dataUser.account_role?.role?.name],
         permissions: permissionsData,
       },
     };
   }
+
+
   private errorResponse(error) {
     return {
       status: 500,
